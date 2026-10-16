@@ -1,0 +1,19 @@
+[Thu Oct 16 09:41:02 2026] nfs: server filer-02.example.internal not responding, still trying
+[Thu Oct 16 09:43:11 2026] INFO: task tar:30117 blocked for more than 122 seconds.
+[Thu Oct 16 09:43:11 2026]       Not tainted 5.14.0-427.13.1.el9_4.x86_64 #1
+[Thu Oct 16 09:43:11 2026] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[Thu Oct 16 09:43:11 2026] task:tar             state:D stack:0     pid:30117 ppid:30101  flags:0x00004002
+[Thu Oct 16 09:43:11 2026] Call Trace:
+[Thu Oct 16 09:43:11 2026]  <TASK>
+[Thu Oct 16 09:43:11 2026]  __schedule+0x21b/0x550
+[Thu Oct 16 09:43:11 2026]  schedule+0x2d/0x70
+[Thu Oct 16 09:43:11 2026]  rpc_wait_bit_killable+0xd/0x60 [sunrpc]
+[Thu Oct 16 09:43:11 2026]  __wait_on_bit+0x42/0x110
+[Thu Oct 16 09:43:11 2026]  out_of_line_wait_on_bit+0x8c/0xb0
+[Thu Oct 16 09:43:11 2026]  __rpc_execute+0x10f/0x3a0 [sunrpc]
+[Thu Oct 16 09:43:11 2026]  rpc_run_task+0x12d/0x190 [sunrpc]
+[Thu Oct 16 09:43:11 2026]  nfs4_proc_getattr+0x9c/0x150 [nfsv4]
+[Thu Oct 16 09:43:11 2026]  __nfs_revalidate_inode+0xd2/0x2f0 [nfs]
+[Thu Oct 16 09:43:11 2026]  nfs_getattr+0x1c4/0x3f0 [nfs]
+[Thu Oct 16 09:43:11 2026]  vfs_statx+0x8a/0x150
+[Thu Oct 16 09:43:11 2026]  </TASK>

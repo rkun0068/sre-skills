@@ -1,0 +1,44 @@
+{
+  "skill_name": "kernel-crash-analysis",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "这是生产机 panic 前的 dmesg，帮我分析原因",
+      "files": ["../fixtures/oops-null-deref-oot.txt"],
+      "expected_output": "NULL 指针解引用（地址 0x48 = NULL + 字段偏移），发生在 out-of-tree 未签名模块 acme_nic 的软中断收包路径，panic_on_oops 导致整机 panic；首要怀疑第三方模块，建议联系供应商/回退模块版本。",
+      "expectations": [
+        "运行 extract_oops.py 提取字段",
+        "指出 address 0x48 属于 NULL 指针加字段偏移",
+        "指出 taint O/E 和 acme_nic(OE)，把第三方模块列为首要怀疑对象",
+        "指出处于中断上下文（<IRQ>，swapper），panic 原因为 Fatal exception in interrupt",
+        "处置建议中的回退或禁用模块被标为需要确认",
+        "如需符号化，说明在独立分析机上进行，且 debuginfo 版本须为 5.14.0-427.13.1.el9_4.x86_64"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "web-17 崩了一次，日志如下，是硬件坏了吗？",
+      "files": ["../fixtures/gpf-list-poison.txt"],
+      "expected_output": "GPF 地址 0xdead000000000122 是 LIST_POISON2，说明访问了已删除的链表节点（链表损坏 / use-after-free），位于 TCP 关闭路径；内核未被污染。单次出现不能断定是硬件，应检查同版本其他机器是否有相同栈并检索已知问题。",
+      "expectations": [
+        "识别 0xdead000000000122 为 LIST_POISON（链表损坏或 use-after-free）",
+        "指出 Not tainted，没有第三方模块的嫌疑",
+        "不直接断定为硬件问题，而是建议检查集群中同内核版本的机器是否有相同栈",
+        "建议用函数名检索 Ubuntu Launchpad / lore.kernel.org 和新版内核 changelog"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "机器意外重启了，但 dmesg 和 journal 里都没看到 panic，/var/crash 也是空的，怎么办？",
+      "files": [],
+      "expected_output": "按 capture-when-broken.md 逐项检查：last -x、上次启动日志（journal 是否持久化）、pstore、kernel.panic 自动重启、物理机 BMC SEL / 虚拟机宿主机事件；不直接断定为内核 bug；把开启 kdump / journal 持久化列为需要确认的行动项。",
+      "expectations": [
+        "检查 journal 是否持久化以及 pstore",
+        "检查 kernel.panic 是否设置了自动重启",
+        "物理机建议查看 ipmitool sel elist，虚拟机建议查看宿主机或云平台事件",
+        "不在缺乏证据时断定为内核 bug",
+        "把开启 kdump 列为需要确认的行动项"
+      ]
+    }
+  ]
+}

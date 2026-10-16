@@ -1,0 +1,17 @@
+2026-10-12T03:14:07+0800 web-17 kernel: general protection fault, probably for non-canonical address 0xdead000000000122: 0000 [#1] PREEMPT SMP NOPTI
+2026-10-12T03:14:07+0800 web-17 kernel: CPU: 12 PID: 48211 Comm: nginx Not tainted 6.8.0-45-generic #45-Ubuntu
+2026-10-12T03:14:07+0800 web-17 kernel: Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3 04/01/2014
+2026-10-12T03:14:07+0800 web-17 kernel: RIP: 0010:__list_del_entry_valid_or_report+0x1c/0xd0
+2026-10-12T03:14:07+0800 web-17 kernel: Code: 90 90 90 90 f3 0f 1e fa 48 8b 17 48 8b 4f 08 48 85 d2 74 2a <48> 8b 32 48 39 fe 75 3a 48 8b 01 48 39 f8 75 51 b8 01 00 00 00
+2026-10-12T03:14:07+0800 web-17 kernel: Call Trace:
+2026-10-12T03:14:07+0800 web-17 kernel:  <TASK>
+2026-10-12T03:14:07+0800 web-17 kernel:  ? die_addr+0x37/0x90
+2026-10-12T03:14:07+0800 web-17 kernel:  ? exc_general_protection+0x1b6/0x420
+2026-10-12T03:14:07+0800 web-17 kernel:  __list_del_entry_valid_or_report+0x1c/0xd0
+2026-10-12T03:14:07+0800 web-17 kernel:  inet_csk_destroy_sock+0x54/0x150
+2026-10-12T03:14:07+0800 web-17 kernel:  tcp_done+0x9a/0xd0
+2026-10-12T03:14:07+0800 web-17 kernel:  tcp_rcv_state_process+0x6b2/0xf40
+2026-10-12T03:14:07+0800 web-17 kernel:  tcp_v4_do_rcv+0xbe/0x2a0
+2026-10-12T03:14:07+0800 web-17 kernel:  </TASK>
+2026-10-12T03:14:07+0800 web-17 kernel: Modules linked in: tls xt_conntrack nf_conntrack virtio_net virtio_blk
+2026-10-12T03:14:07+0800 web-17 kernel: ---[ end trace 0000000000000000 ]---

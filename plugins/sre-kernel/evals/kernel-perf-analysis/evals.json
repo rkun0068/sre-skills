@@ -1,0 +1,41 @@
+{
+  "skill_name": "kernel-perf-analysis",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "order-api 服务半夜被 kill 了，机器内存明明还有一半空闲，日志如下",
+      "files": ["../fixtures/oom-memcg.txt"],
+      "expected_output": "CONSTRAINT_MEMCG：order-api.service 达到了自身 cgroup 8GiB 的内存上限（failcnt 1294），不是整机内存不足；java anon-rss 约 7.9GiB。应调整该服务的 MemoryMax 或排查 JVM 堆配置（-Xmx 不应超过 cgroup 限制）。",
+      "expectations": [
+        "识别 CONSTRAINT_MEMCG / Memory cgroup out of memory，说明不是整机内存不足",
+        "指出 cgroup 限制为 8GiB，且 anon-rss 是主要占用",
+        "建议核对 JVM -Xmx 与 cgroup 限制",
+        "不建议 drop_caches 作为解决方案"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "10.20.5.8 最近接口延迟变高，帮我看看主机有没有问题",
+      "files": [],
+      "expected_output": "先确认慢的度量和起始时间，然后运行 sixty_seconds.sh 和 use_snapshot.sh，按 USE 先看错误和饱和度，再定位到具体子系统；如果主机层面没有瓶颈，要如实说明。",
+      "expectations": [
+        "先确认怎么度量慢、从什么时候开始、最近有什么变化",
+        "运行 sixty_seconds.sh，然后运行 use_snapshot.sh",
+        "按 USE 方法优先检查错误和饱和度",
+        "主机没有瓶颈时如实说明，而不是硬凑结论"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "CPU 一直 90% 以上，直接给我跑个 perf record 火焰图吧",
+      "files": [],
+      "expected_output": "perf record 属于档位 2，需要确认：说明开销，限定在 30 秒内，输出写到 /tmp 且用完删除；先用 mpstat / pidstat 和档位 1 的 perf top 缩小范围；注意 RHEL 与 Ubuntu 的包名差异以及调用栈完整性问题。",
+      "expectations": [
+        "把 perf record 列为需要确认的档位 2 操作，限定时长并说明输出位置",
+        "先用档位 0 或 1 的工具缩小范围",
+        "提到 cgroup CPU 限流（cpu.stat 中的 nr_throttled）的可能性",
+        "说明调用栈不完整或符号缺失时的处理方式"
+      ]
+    }
+  ]
+}

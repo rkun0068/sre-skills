@@ -1,0 +1,5 @@
+{
+  "name": "sre-kernel",
+  "version": "0.1.0",
+  "description": "Read-only Linux kernel troubleshooting on RHEL-family and Ubuntu hosts over SSH: triage, crash/oops/vmcore, lockups and hung tasks, performance (USE method)."
+}

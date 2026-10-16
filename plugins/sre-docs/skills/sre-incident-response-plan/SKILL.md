@@ -1,0 +1,58 @@
+---
+name: sre-incident-response-plan
+description: >-
+  Draft or review a standardized incident response (IR) team charter and response plan following Google's "Building Secure and Reliable Systems" (Ch16 Disaster Planning, Ch17 roles) — staffing model, mission/scope/success criteria, roles (IC, OL, CL, legal, privacy, forensics), single-point-of-failure avoidance, severity & priority models, response SLOs, reporting/triage/outreach/communications plans incl. out-of-band channels, prestaged systems and access, training, procurement, evidence preservation, and tooling. TRIGGER when: the user asks for 事件响应计划, 应急响应预案, IR plan, incident management process, 值班与升级制度, 安全事件响应流程, or an IR team charter. DO NOT TRIGGER when: an incident is happening now (sre-incident-doc), or the user needs a step-by-step procedure for one task (sre-playbook).
+---
+
+# 事件响应团队章程与响应计划
+
+> 先读 [`../sre-doc-standards/SKILL.md`](../sre-doc-standards/SKILL.md)——严重度/优先级模型以第 2 节为基础，本计划负责发布组织内的量化细则。
+
+模板：[`assets/template.md`](assets/template.md)
+
+## 文档分层
+
+- **响应计划**（本文档）：高层流程——如何上报、谁来分诊、SLO、角色、如何拉人、如何沟通。
+- **Playbook**（`sre-playbook`）：任务级步骤（授予紧急权限、解析日志、故障切换、开启降级）。响应计划引用 Playbook。
+
+## 起草方法
+
+1. **人员模式**：专职 IR 团队 / 兼职（在本职上叠加）/ 外包（注意响应更慢）/ 轮班防疲劳。
+2. **章程**：
+   - 使命：一句话说明处理哪类事件；
+   - 范围：覆盖的技术、用户、产品、干系人；哪些自己处理、哪些交给外包；
+   - 成功标准：怎么判断工作完成；
+   - 工作负载：保持可持续，保护士气与留存。
+3. **角色**（是角色而非固定的人，一人可兼多个）：事件指挥官 IC、运营负责人 OL、沟通负责人 CL、管理层联络人、法务、隐私工程师、取证专家、安全工程师、SRE/工程师、公关、客户支持；后期加入修复负责人 RL。
+4. **避免单点**：为紧急修复、配置变更和对外沟通指定可审批的代理人；跨国组织覆盖多个时区；设立有足够资历的 IR "倡导者"来调配资源、清除障碍。
+5. **严重度与优先级**：基于共享约定的 0–4 刻度，给出本组织每一级的量化标准和示例；对照灾难风险评估校准。
+6. **运行参数与 SLO**：首次响应时间（如 5 分钟到下个工作日，按优先级）、完成初步分诊/响应计划/排班的时间、什么情况下事件工作打断常规工作、值班轮换。
+7. **响应流程**：上报渠道 → 分诊（谁先响应）→ 声明事件与指定 IC → 拉人（如何联系工程团队）→ 沟通 → 关闭。首个响应人单独处理的时间上限（如先定 15 分钟，按风险容忍度调整），超时必须升级。预先定义决策标准（如何时下线被入侵系统），并说明存在冲突目标（可用性 vs 保留取证证据）。
+8. **沟通计划**：如何通知管理层（说什么、什么渠道）；内部渠道（聊天、视频、邮件、工单）；与法务共同规划的外部干系人（监管、执法）；通知客户支持；**带外备用渠道**——假设主渠道可能已被攻击者监听或不可用。
+9. **预置系统**：容错与故障切换；预先部署取证 agent 并开启日志；日志保留期足够长以发现入侵（行业平均发现时间约 200 天）同时符合法律要求（咨询法务）；备用软硬件与定期恢复演练；多条后备访问路径（安全的带外控制面、已知干净的隔离系统）。
+10. **预批准访问**：为 IR 人员预定义访问级别（日志只读、分析/取证工具），预定义升级路径。
+11. **培训**：IR 成员熟悉严重度/优先级模型、运行模型、响应时间、计划和 Playbook 位置；所有可能参与的工程师了解 IR 角色（如基于 ICS 的事件管理框架），避免好心办坏事；全员知道如何识别、上报、升级；响应者记录自己的操作以便区分自身改动与攻击者痕迹。
+12. **流程与采购**：紧急采购（硬件、软件、发电机燃料等）、外包服务（取证）合同审批、证据与日志保全策略。
+13. **工具与存放**：事件跟踪系统的访问控制与事件类型匹配（安全/隐私事件严格受限，可用性事件广泛可见）；文档在公司基础设施外有可访问副本；随系统和威胁变化持续更新。
+14. **测试**：至少每年测试一次（见 `sre-dr-exercise`）。
+
+## 质量门禁
+
+- [ ] 章程含使命、范围、成功标准、工作负载
+- [ ] 角色清单完整，且每个关键角色有代理人
+- [ ] 严重度、优先级各有 0–4 量化标准与示例
+- [ ] 有按优先级的响应 SLO 与首个响应人升级时限
+- [ ] 上报 → 分诊 → 声明 → 拉人 → 沟通 → 关闭 流程完整
+- [ ] 有带外沟通渠道，并考虑主渠道被监听
+- [ ] 外部干系人（监管/执法/客户）通知流程经法务确认
+- [ ] 预置：取证 agent、日志保留、备用硬件、带外访问
+- [ ] IR 人员预批准访问与升级路径已定义
+- [ ] 培训对象、内容、频率已定义
+- [ ] 紧急采购与证据保全流程已定义
+- [ ] 文档有公司基础设施外的副本
+- [ ] 有测试计划与下次复审日期
+
+## 出处
+
+- [Ch16 Disaster Planning](https://google.github.io/building-secure-and-reliable-systems/raw/ch16.html)
+- [Ch17 Crisis Management](https://google.github.io/building-secure-and-reliable-systems/raw/ch17.html)（IMAG 角色）

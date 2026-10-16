@@ -1,0 +1,21 @@
+{
+  "name": "sre-skills",
+  "owner": {
+    "name": "yukun.song"
+  },
+  "metadata": {
+    "description": "SRE skills: standardized security & reliability documents and Linux kernel troubleshooting."
+  },
+  "plugins": [
+    {
+      "name": "sre-docs",
+      "source": "./plugins/sre-docs",
+      "description": "Draft and review SRE documents (threat model, design review, IR plan, playbook, incident doc, recovery plan, postmortem, ...) based on Google's Building Secure and Reliable Systems."
+    },
+    {
+      "name": "sre-kernel",
+      "source": "./plugins/sre-kernel",
+      "description": "Read-only Linux kernel troubleshooting over SSH: triage, oops/panic/vmcore analysis, lockup and hung-task analysis, USE-method performance analysis."
+    }
+  ]
+}
