@@ -1,0 +1,67 @@
+---
+name: sre-incident-doc
+description: >-
+  Create or maintain a standardized live incident command document following Google's "Building Secure and Reliable Systems" (Ch17 Crisis Management) — triage (is it a crisis), explicit declaration and IC acceptance, IMAG roles, rules of engagement and OpSec, investigation tracks (forensics / reversing / hunting), forensic timeline, IC loop status updates, kickoff / sync / handover meeting agendas, audience-tailored communications, customer notice draft, and closure criteria. TRIGGER when: the user says an incident/outage/compromise is happening, asks to 开事件文档, 事故作战室文档, incident doc, war room notes, 事件状态更新, 交接班, 对外通报草稿, or wants help running incident meetings. DO NOT TRIGGER when: the incident is over and a postmortem is wanted (sre-postmortem), or a recovery/remediation plan is being written (sre-recovery-plan, which this doc links to).
+---
+
+# 事件指挥工作文档
+
+> 先读 [`../sre-doc-standards/SKILL.md`](../sre-doc-standards/SKILL.md)。事件进行中，**速度优先**：先建骨架（元数据、声明、角色、当前状态），其余随进展补全。
+
+模板：[`assets/template.md`](assets/template.md)
+
+## 使用方式
+
+这是一份**活文档**，贯穿事件全程，也是复盘的原始材料。它可能具有法律意义——只记录事实、决策和依据。
+
+## 关键动作（按时间顺序）
+
+1. **分诊：是不是危机**。判断为：误报 / 易修复的问题（如机会主义入侵，可走 Playbook）/ 复杂且潜在破坏性的问题（如定向入侵，需要有组织的响应）。分诊问题：
+   - 受影响系统能触达哪些数据，有多关键？
+   - 它与其他系统有哪些信任关系？
+   - 补偿控制是否仍完好，攻击者是否还需突破它们？
+   - 是通用恶意软件，还是高级/定向攻击？
+2. **别慌，先计划**：安全事件与可用性事件不同——攻击者可能在观察，**先调查清楚再修复**。
+3. **显式声明**：写明问题、严重度/优先级、"我是 IC"；IC 必须被明确指定并明确接受。通知管理层：遏制前可能绕过常规流程。
+4. **指定角色**：IC（不亲自操作）、OL、CL、管理层联络人、法务、记录员；稍后 RL。
+5. **交战规则与 OpSec**（启动会上宣布，每位成员书面确认）：
+   - 保密范围、决策人与排除人员、切换任务需通知；
+   - 不在攻击者可能监听的渠道讨论（如公司邮件）；必要时用全新的干净设备与临时环境；
+   - 不登录被入侵系统（会暴露凭据），使用预部署取证 agent；
+   - 不接触攻击者 C2（下载样本、扫描、查询域名）；IOC 去武器化书写，防止链接预览泄露；
+   - 调查完成前不锁账号、不改密码、不下线系统；
+   - 例外：对关键数据、系统或生命存在迫在眉睫的明确风险时，可接受失去保密性而采取破坏性遏制，由高层在 IC 建议下决策。
+6. **调查**：先不动手；围绕关键问题（如何进入、后门能做什么、还在哪里、做了什么）展开。并行分组：
+   - 取证：受影响系统与攻击者接触过什么（磁盘/内存镜像、文件恢复、日志分析）；
+   - 逆向：分析可疑二进制、提取 IOC；
+   - 狩猎：全网搜 IOC，把可疑主机交给取证；
+   - 维护**取证时间线**以建立因果。新线索放缓、且已足以驱逐攻击者并保护目标数据时，转入修复（链接 `sre-recovery-plan`）。
+7. **IC 循环**（每轮更新"当前状态"）：与各负责人确认进展、新发现、阻碍、人手、新风险、疲劳 → 更新状态文档 → 确认管理层/法务/公关已知情 → 识别所需资源 → 找可并行的任务 → 是否足以开始修复 → 定下次汇报时间 → 事件是否结束。按 OODA（观察-判断-决策-行动）思考后再行动。
+8. **会议**：小范围（负责人参会，其他人干活），每次有议程和记录员。按模板中的启动会、进展同步会、交接会议程执行。
+9. **交接**：连续工作（含 IC）不超过约 12 小时；可用双班轮换或跟随太阳。交接会：记录员（最好来自接班方）→ 交班 IC 总结现状 → 交班 IC 列出若不交接未来 12 小时会做的事 → 讨论 → 接班 IC 给出未来 12 小时计划 → 接班 IC 定会议时间并**明确接受指挥权和负责时段**。各负责人与对应接班人一对一交接并确认理解。
+10. **士气**：安排吃饭、强制休息、留意倦怠，领导以身作则。
+11. **沟通**：
+    - 避免误解：首次使用"已缓解""已遏制"时定义含义；
+    - 避免含糊：写明已确认/未确认及原因；
+    - 按受众裁剪：管理层要简短的进展、阻碍和后果；IR 团队要完整细节；未参与员工按需告知（不说会滋生谣言）；客户可能有法定通知时限；法务与执法可能要更多信息；
+    - CL 负责：回答销售/支持等内部问题，准备给管理层、法务、监管的简报，与公关协调对外口径，执行"需要知道"原则；
+    - 对外通报使用与法务预审过的模板，随事实补全。
+12. **关闭**：修复完成；保全证据（如可能涉及执法）；法务与管理层批准关闭；召开总结会（outbrief），**显式宣布关闭**并通知其他相关团队；尽早指定复盘负责人。
+
+## 质量门禁
+
+- [ ] 有显式声明、严重度/优先级、IC 及其接受记录
+- [ ] 角色表完整，含记录员
+- [ ] 交战规则与 OpSec 已宣布并记录确认
+- [ ] "当前状态"区块按 IC 循环持续更新，标注最后更新时间
+- [ ] 时间线带时区，区分已确认/未确认
+- [ ] IOC 已去武器化
+- [ ] 每次会议有议程、记录员、行动项与下次时间
+- [ ] 每次交接有记录，接班 IC 明确接受指挥权
+- [ ] 对外通报经法务审核
+- [ ] 关闭有审批记录和显式关闭声明，已指定复盘负责人
+
+## 出处
+
+- [Ch17 Crisis Management](https://google.github.io/building-secure-and-reliable-systems/raw/ch17.html)
+- [Ch15 Investigating Systems](https://google.github.io/building-secure-and-reliable-systems/raw/ch15.html)（调查记录与证据）

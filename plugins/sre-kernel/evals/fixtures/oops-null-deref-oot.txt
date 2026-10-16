@@ -1,0 +1,33 @@
+[812345.101234] acme_nic 0000:3b:00.0 eth2: link up, 25Gbps, full duplex
+[812399.553201] BUG: kernel NULL pointer dereference, address: 0000000000000048
+[812399.553210] #PF: supervisor read access in kernel mode
+[812399.553213] #PF: error_code(0x0000) - not-present page
+[812399.553216] PGD 0 P4D 0
+[812399.553220] Oops: 0000 [#1] PREEMPT SMP PTI
+[812399.553224] CPU: 7 PID: 0 Comm: swapper/7 Kdump: loaded Tainted: G           OE     -------  ---  5.14.0-427.13.1.el9_4.x86_64 #1
+[812399.553230] Hardware name: ExampleVendor R740/0A1B2C, BIOS 2.19.1 06/12/2025
+[812399.553233] RIP: 0010:acme_clean_tx_irq+0x5e/0x2b0 [acme_nic]
+[812399.553240] Code: 48 8b 47 30 4c 8b 6f 18 45 31 f6 48 89 04 24 <48> 8b 40 48 85 c0 0f 84 1c 01 00 00 41 0f b7 55 08 66 85 d2 74 7a
+[812399.553245] RSP: 0018:ffffb3c0c0378e90 EFLAGS: 00010246
+[812399.553249] RAX: 0000000000000000 RBX: ffff9a1c4b2e8000 RCX: 0000000000000000
+[812399.553252] CR2: 0000000000000048 CR3: 000000010f210004 CR4: 00000000007706e0
+[812399.553256] Call Trace:
+[812399.553258]  <IRQ>
+[812399.553260]  ? __die+0x20/0x70
+[812399.553264]  ? page_fault_oops+0x75/0x170
+[812399.553268]  ? exc_page_fault+0x64/0x140
+[812399.553271]  ? asm_exc_page_fault+0x22/0x30
+[812399.553275]  acme_clean_tx_irq+0x5e/0x2b0 [acme_nic]
+[812399.553280]  acme_napi_poll+0x41/0x1d0 [acme_nic]
+[812399.553284]  __napi_poll+0x2a/0x170
+[812399.553287]  net_rx_action+0x29e/0x350
+[812399.553290]  __do_softirq+0xd0/0x2c4
+[812399.553293]  __irq_exit_rcu+0x7a/0xa0
+[812399.553296]  common_interrupt+0x80/0xa0
+[812399.553299]  </IRQ>
+[812399.553302] Modules linked in: acme_nic(OE) xt_conntrack nf_conntrack bonding ext4 mbcache jbd2 sd_mod ahci libahci
+[812399.553310] CR2: 0000000000000048
+[812399.553312] ---[ end trace 3f2a1b0c9d8e7f60 ]---
+[812399.601020] Kernel panic - not syncing: Fatal exception in interrupt
+[812399.602331] Kernel Offset: 0x2a000000 from 0xffffffff81000000
+[812399.603110] ---[ end Kernel panic - not syncing: Fatal exception in interrupt ]---

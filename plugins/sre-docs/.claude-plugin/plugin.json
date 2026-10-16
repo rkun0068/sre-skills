@@ -1,0 +1,5 @@
+{
+  "name": "sre-docs",
+  "version": "0.1.0",
+  "description": "Draft and review standardized SRE / security-reliability documents based on Google's Building Secure and Reliable Systems."
+}

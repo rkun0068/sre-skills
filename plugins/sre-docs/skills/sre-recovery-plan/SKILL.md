@@ -1,0 +1,64 @@
+---
+name: sre-recovery-plan
+description: >-
+  Draft or review a standardized incident recovery plan and recovery checklist following Google's "Building Secure and Reliable Systems" (Ch18 Recovery and Aftermath) — recovery team and remediation lead, timeline, scoping (inventory, TTPs, downstream impact), attacker reaction, compromised comms and tooling, clean environments, variants and reintroduced vulnerabilities, mitigation tradeoffs, ordered checklist with commands and rollback, isolation/quarantine, rebuilds, data sanitization and provenance, backup selection, credential and secret rotation. TRIGGER when: the user asks for 恢复计划, 修复方案 after a compromise or major outage, remediation plan, eviction plan, 凭据轮换计划, 重建方案, or a recovery checklist. DO NOT TRIGGER when: the incident is still being triaged/investigated (sre-incident-doc), or the user wants a generic reusable procedure (sre-playbook).
+---
+
+# 恢复计划与恢复清单
+
+> 先读 [`../sre-doc-standards/SKILL.md`](../sre-doc-standards/SKILL.md)。
+
+模板：[`assets/template.md`](assets/template.md)
+
+## 原则
+
+- **恢复与调查分开**：由不同团队承担，并行推进、持续共享信息，让调查人员可以休息。
+- **没有计划和清单不开始恢复**。计划可与执行重叠，可基于调查团队的复盘草稿。
+- 恢复团队通常是日常建设和运维这些系统的人（SRE、开发、系统管理员、安全人员），可由外部补充。
+- 计划对所有人可见、可实时更新，但**不能让攻击者看到**：机器确认干净前，可先用纸质卡片等低技术手段；指定记录员保留审计轨迹。
+
+## 起草方法
+
+1. **组织**：IC/OL 指定修复负责人 RL；RL 制定计划、与 IC 协调清单、召集专家。
+2. **时机**：立即开始（如关键设施遭 DoS），或在完全理解攻击者行动后再开始——写明选择及理由。
+3. **确定范围**：
+   - 受影响系统、网络、数据的完整清单；
+   - 基于攻击者 TTP 推断其他可能受影响的资源；
+   - 追踪下游影响（如配置系统被入侵，则所有接收其配置的系统都在范围内）；
+   - 每个资产对照攻击者行为，确定防止复发的措施。
+4. **关键考虑**：
+   - **攻击者反应**：假设有人在看；完全掌握其访问范围后再驱逐，否则可能引发破坏；若正在造成伤害，可提前行动但要充分准备；
+   - **沟通是否被入侵**：邮件、聊天、工单、日历可能被监听，使用独立干净的渠道；
+   - **恢复工具是否被入侵**：配置服务器、备份工具等先确认并优先修复；
+   - **干净环境**：在隔离的干净环境中恢复，必要时复制部分或全部基础设施；
+   - **变体**：其他系统是否运行同样的漏洞软件、是否存在同类漏洞、全栈补丁可用性，重点关注自研代码与共享库；
+   - **重复风险**：分析整类故障，而非单个实例；
+   - **重新引入漏洞**：不要从含攻击者改动或漏洞软件的黄金镜像、快照、配置、备份恢复；确定攻击者首次改动时间，回退到其之前；隔离含证据的备份；
+   - **缓解权衡**：临时方案能撑多久？会有人维护吗？影响可用性/错误预算吗？是否明确标注为临时？未来工程师能否安全移除？如果长期存在会怎样？领域专家是否评审过？
+5. **恢复清单**：把范围与权衡转成清单——每项映射到任务和所需技能，便于认领；写明具体工具和命令；标注顺序与依赖；包含清理与回滚步骤；复杂步骤前做"手离键盘"确认。
+6. **执行要点**：
+   - **隔离**：在网络层（如关闭交换机端口）或主机层隔离；网络分段；必须暂时在线的被入侵资产放进独立网络并严格限流，作为技术债明确标记并跟踪到永久处理；
+   - **重建**：优先从已知良好镜像重装，而不是删除恶意软件后继续运行；缺乏源码管理/标准镜像/配置管理时，考虑作为短期恢复的一部分引入；
+   - **数据净化**：校验源码、二进制、镜像、配置、构建发布系统未被篡改（对比原始来源/备份/干净版本库的校验和）；用二进制 provenance 追溯"风险期"内构建、部署和依赖的制品，标记受损制品并加测试防止再次引入；检查业务数据是否被篡改；
+   - **恢复数据**：未经生产规模测试，不改恢复工具的速度/安全默认参数；用监控与日志独立估计攻击开始时间以决定回退多远；旧备份可能重新激活入侵，最早的安全备份可能已被覆盖——此时只能做数据修复；校验恢复数据的签名；
+   - **凭据与秘密轮换**：系统、用户、服务、应用账号（含 SSH 密钥）、网络设备、带外管理、SaaS；TLS 密钥、静态加密密钥、API 密钥；代码或本地文件中的服务密钥视为高风险。优先级：管理员账号 → 已知泄露账号 → 可访问敏感资源的账号。大范围入侵时可能需要全组织统一轮换，提前规划影响；注意攻击者可能据历史密码推测新密码；顺手上线快速收益（如邮箱 2FA）。
+7. **收尾**：恢复结束立即启动后续工作，确认所有临时隔离资产已永久处理，交接给复盘（`sre-postmortem`）。
+
+## 质量门禁
+
+- [ ] 指定 RL，恢复团队与调查团队分开
+- [ ] 写明恢复时机与理由
+- [ ] 受影响资产清单完整，含下游影响
+- [ ] 八项关键考虑逐项给出结论
+- [ ] 恢复环境确认为干净，恢复工具已验证
+- [ ] 选定的备份/镜像早于攻击者首次改动，并说明依据
+- [ ] 清单每项有负责人、命令、依赖、验证和回滚
+- [ ] 凭据/秘密轮换按优先级排序且覆盖全部类型
+- [ ] 每个临时缓解都回答了权衡问题并标注为临时
+- [ ] 计划存放位置对攻击者不可见，且有审计轨迹
+- [ ] 隔离资产有跟踪清单，复盘时确认已永久处理
+
+## 出处
+
+- [Ch18 Recovery and Aftermath](https://google.github.io/building-secure-and-reliable-systems/raw/ch18.html)
+- [Ch9 Design for Recovery](https://google.github.io/building-secure-and-reliable-systems/raw/ch09.html)

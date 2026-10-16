@@ -1,0 +1,12 @@
+Oct 16 02:10:44 db-03 kernel: watchdog: BUG: soft lockup - CPU#5 stuck for 26s! [postgres:18822]
+Oct 16 02:10:44 db-03 kernel: CPU: 5 PID: 18822 Comm: postgres Tainted: G             L     6.8.0-45-generic #45-Ubuntu
+Oct 16 02:10:44 db-03 kernel: Hardware name: Example Cloud VM, BIOS 1.0 01/01/2011
+Oct 16 02:10:44 db-03 kernel: RIP: 0010:smp_call_function_many_cond+0x12e/0x500
+Oct 16 02:10:44 db-03 kernel: Call Trace:
+Oct 16 02:10:44 db-03 kernel:  <TASK>
+Oct 16 02:10:44 db-03 kernel:  on_each_cpu_cond_mask+0x24/0x40
+Oct 16 02:10:44 db-03 kernel:  flush_tlb_mm_range+0x1a6/0x200
+Oct 16 02:10:44 db-03 kernel:  change_protection+0x5c1/0x9c0
+Oct 16 02:10:44 db-03 kernel:  mprotect_fixup+0x1c3/0x2e0
+Oct 16 02:10:44 db-03 kernel:  </TASK>
+Oct 16 02:10:51 db-03 kernel: rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
