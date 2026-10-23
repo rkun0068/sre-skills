@@ -1,0 +1,6 @@
+# Codex / ChatGPT skill metadata. Claude Code ignores this file.
+interface:
+  display_name: "SRE postmortem"
+  short_description: "Draft or review a blameless postmortem"
+policy:
+  allow_implicit_invocation: true

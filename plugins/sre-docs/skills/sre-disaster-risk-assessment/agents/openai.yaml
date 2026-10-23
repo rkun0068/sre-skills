@@ -1,0 +1,6 @@
+# Codex / ChatGPT skill metadata. Claude Code ignores this file.
+interface:
+  display_name: "SRE disaster risk assessment"
+  short_description: "Score disaster risks by probability and impact"
+policy:
+  allow_implicit_invocation: true

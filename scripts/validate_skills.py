@@ -9,14 +9,25 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 PLUGINS = ROOT / "plugins"
 MAX_SKILL_LINES = 500
+# Codex lists every skill's description within ~8,000 characters (2% of context when unknown)
+MAX_DESCRIPTION = 400
+MAX_DESCRIPTION_TOTAL = 8000
+# agent-neutral bodies: no plugin-prefixed skill names, no cwd-relative runnable script paths
+RE_PLUGIN_PREFIX = re.compile(r"\b(?:sre-docs|sre-kernel|tech-docs):[a-z]")
+RE_BARE_SCRIPT_RUN = re.compile(r"(?:python3\s+|bash\s+|<\s*|^\s*)(?:\./)?(?:\.\./[\w-]+/)?scripts/[\w.-]+\.(?:sh|py)", re.M)
+RE_AGENT_NAME = re.compile(r"\b(Claude|Codex|ChatGPT)\b")
+AGENT_NAME_OK = "Claude Code 和 Codex"
 
 DOCS_SHARED = "sre-doc-standards"
 DOCS_METADATA = ["文档类型", "标题", "状态", "密级", "Owner", "创建日期", "最后更新"]
 # Live/procedural docs track work elsewhere (live task tracker / revision log).
 DOCS_NO_ACTION_TABLE = {"sre-incident-doc", "sre-playbook"}
 
-KERNEL_ENTRY = "kernel-triage"
-KERNEL_MIN_EVALS = 3
+# plugin -> shared-protocol skill every other skill in that plugin must reference
+PLUGIN_ENTRY = {"sre-docs": DOCS_SHARED, "sre-kernel": "kernel-triage", "tech-docs": "tech-doc-style"}
+# plugins whose skills ship scripts and must have evals/<skill>/evals.json
+EVAL_PLUGINS = {"sre-kernel", "tech-docs"}
+MIN_EVALS = 3
 # fixture -> report types extract_oops.py must find, in order
 KERNEL_FIXTURES = {
     "oops-null-deref-oot.txt": ["page_fault"],
@@ -26,7 +37,19 @@ KERNEL_FIXTURES = {
     "oom-memcg.txt": ["oom"],
 }
 
+# fixture -> lint rules that must be reported; good-* fixtures must produce no findings
+LINT_FIXTURES = {
+    "bad-en.md": ["en-inclusive", "heading-case", "en-please", "en-timeless", "en-trivial", "en-directional",
+                  "en-click-on", "en-latin", "placeholder-angle", "placeholder-possessive", "link-text",
+                  "date-ambiguous", "image-alt", "heading-h1", "en-claims", "code-lang"],
+    "bad-zh.md": ["zh-space", "zh-punct", "zh-trivial", "zh-please-note", "zh-timeless", "zh-directional",
+                  "zh-inclusive", "zh-exclaim", "placeholder-angle", "link-text", "heading-punct"],
+    "good-en.md": [],
+    "good-zh.md": [],
+}
+
 errors = []
+DESCRIPTION_LENGTHS = []
 
 
 def err(msg):
@@ -51,16 +74,36 @@ def frontmatter(text):
 def check_manifests():
     mp = json.loads((ROOT / ".claude-plugin" / "marketplace.json").read_text())
     listed = {p["name"]: p["source"] for p in mp["plugins"]}
+    cx = json.loads((ROOT / ".agents" / "plugins" / "marketplace.json").read_text())
+    cx_listed = {}
+    for p in cx["plugins"]:
+        cx_listed[p["name"]] = p["source"].get("path")
+        for field in ("policy", "category"):
+            if field not in p:
+                err(f"codex marketplace: {p['name']} missing {field}")
+        if not {"installation", "authentication"} <= set(p.get("policy", {})):
+            err(f"codex marketplace: {p['name']} policy needs installation and authentication")
+    if cx_listed != listed:
+        err(f"codex marketplace plugins {cx_listed} differ from claude marketplace {listed}")
     for d in sorted(p for p in PLUGINS.iterdir() if p.is_dir()):
         if d.name not in listed:
             err(f"{d.name}: plugin not listed in marketplace.json")
         elif (ROOT / listed[d.name]).resolve() != d.resolve():
             err(f"{d.name}: marketplace source {listed[d.name]} does not point to {d}")
-        pj = d / ".claude-plugin" / "plugin.json"
-        if not pj.exists():
-            err(f"{d.name}: missing .claude-plugin/plugin.json")
-        elif json.loads(pj.read_text()).get("name") != d.name:
-            err(f"{d.name}: plugin.json name mismatch")
+        manifests = {}
+        for rel in (".claude-plugin/plugin.json", "plugin.json"):
+            pj = d / rel
+            if not pj.exists():
+                err(f"{d.name}: missing {rel}")
+                continue
+            manifests[rel] = json.loads(pj.read_text())
+            for field in ("name", "version", "description"):
+                if not manifests[rel].get(field):
+                    err(f"{d.name}: {rel} missing {field}")
+            if manifests[rel].get("name") != d.name:
+                err(f"{d.name}: {rel} name mismatch")
+        if len({m.get("version") for m in manifests.values()}) > 1:
+            err(f"{d.name}: plugin.json and .claude-plugin/plugin.json versions differ")
     for name in listed:
         if not (PLUGINS / name).is_dir():
             err(f"marketplace lists missing plugin {name}")
@@ -75,8 +118,32 @@ def check_skill_common(plugin, d, text, readme):
     desc = fm.get("description", "")
     if not desc:
         err(f"{plugin}/{d.name}: empty description")
-    elif len(desc) > 1024:
-        err(f"{plugin}/{d.name}: description is {len(desc)} chars (> 1024)")
+    elif len(desc) > MAX_DESCRIPTION:
+        err(f"{plugin}/{d.name}: description is {len(desc)} chars (> {MAX_DESCRIPTION}, Codex budget)")
+    DESCRIPTION_LENGTHS.append(len(desc))
+    if set(fm) - {"name", "description"}:
+        err(f"{plugin}/{d.name}: frontmatter has fields other than name/description: {sorted(set(fm) - {'name', 'description'})}")
+    oy = d / "agents" / "openai.yaml"
+    if not oy.exists():
+        err(f"{plugin}/{d.name}: missing agents/openai.yaml")
+    else:
+        y = oy.read_text()
+        for key in ("display_name:", "short_description:", "allow_implicit_invocation:"):
+            if key not in y:
+                err(f"{plugin}/{d.name}: agents/openai.yaml missing {key}")
+    for md in [d / "SKILL.md", *sorted((d / "references").glob("*.md"))]:
+        body = md.read_text(encoding="utf-8")
+        if md.name == "SKILL.md":
+            body = body.split("\n---\n", 1)[-1]
+        rel = md.relative_to(d)
+        if RE_PLUGIN_PREFIX.search(body):
+            err(f"{plugin}/{d.name}/{rel}: use bare skill names, not plugin-prefixed names")
+        for m in RE_BARE_SCRIPT_RUN.finditer(body):
+            line = body[body.rfind("\n", 0, m.start()) + 1: body.find("\n", m.end())]
+            if "SKILL_DIR" not in line and "decode_stacktrace" not in line:
+                err(f"{plugin}/{d.name}/{rel}: runnable script path without SKILL_DIR: {line.strip()[:80]}")
+        if RE_AGENT_NAME.search(body.replace(AGENT_NAME_OK, "")):
+            err(f"{plugin}/{d.name}/{rel}: names a specific agent; keep instructions agent-neutral")
     for kw in ("TRIGGER when", "DO NOT TRIGGER when"):
         if kw not in desc:
             err(f"{plugin}/{d.name}: description missing '{kw}'")
@@ -94,11 +161,15 @@ def check_skill_common(plugin, d, text, readme):
         err(f"{plugin}/{d.name}: not indexed in README.md")
 
 
+def check_entry_reference(plugin, d, text):
+    entry = PLUGIN_ENTRY.get(plugin)
+    if entry and d.name != entry and f"../{entry}/SKILL.md" not in text:
+        err(f"{plugin}/{d.name}: does not reference ../{entry}/SKILL.md")
+
+
 def check_docs_skill(d, text):
     if d.name == DOCS_SHARED:
         return
-    if f"../{DOCS_SHARED}/SKILL.md" not in text:
-        err(f"sre-docs/{d.name}: does not reference ../{DOCS_SHARED}/SKILL.md")
     if "## 质量门禁" not in text or "## 出处" not in text:
         err(f"sre-docs/{d.name}: missing 质量门禁 or 出处 section")
     tpl = d / "assets" / "template.md"
@@ -112,9 +183,8 @@ def check_docs_skill(d, text):
         err(f"sre-docs/{d.name}: template missing standard action-item table")
 
 
-def check_kernel_skill(plugin_dir, d, text):
-    if d.name != KERNEL_ENTRY and f"../{KERNEL_ENTRY}/SKILL.md" not in text:
-        err(f"sre-kernel/{d.name}: does not reference ../{KERNEL_ENTRY}/SKILL.md")
+def check_scripts_and_evals(plugin_dir, d):
+    plugin = plugin_dir.name
     for script in sorted((d / "scripts").glob("*")):
         if script.suffix == ".sh":
             r = subprocess.run(["bash", "-n", str(script)], capture_output=True, text=True)
@@ -123,21 +193,21 @@ def check_kernel_skill(plugin_dir, d, text):
         else:
             continue
         if r.returncode:
-            err(f"sre-kernel/{d.name}: {script.name} syntax error: {r.stderr.strip()}")
+            err(f"{plugin}/{d.name}: {script.name} syntax error: {r.stderr.strip()}")
         if not script.stat().st_mode & 0o111:
-            err(f"sre-kernel/{d.name}: {script.name} is not executable")
+            err(f"{plugin}/{d.name}: {script.name} is not executable")
     ev = plugin_dir / "evals" / d.name / "evals.json"
     if not ev.exists():
-        return err(f"sre-kernel/{d.name}: missing evals/{d.name}/evals.json")
+        return err(f"{plugin}/{d.name}: missing evals/{d.name}/evals.json")
     data = json.loads(ev.read_text())
     if data.get("skill_name") != d.name:
-        err(f"sre-kernel/{d.name}: evals.json skill_name mismatch")
-    if len(data.get("evals", [])) < KERNEL_MIN_EVALS:
-        err(f"sre-kernel/{d.name}: fewer than {KERNEL_MIN_EVALS} evals")
+        err(f"{plugin}/{d.name}: evals.json skill_name mismatch")
+    if len(data.get("evals", [])) < MIN_EVALS:
+        err(f"{plugin}/{d.name}: fewer than {MIN_EVALS} evals")
     for case in data.get("evals", []):
         for f in case.get("files", []):
             if not (ev.parent / f).exists():
-                err(f"sre-kernel/{d.name}: eval {case.get('id')} references missing {f}")
+                err(f"{plugin}/{d.name}: eval {case.get('id')} references missing {f}")
 
 
 def check_kernel_fixtures(plugin_dir):
@@ -153,6 +223,22 @@ def check_kernel_fixtures(plugin_dir):
             err(f"extract_oops.py on {name}: got {got}, expected {expected}")
 
 
+def check_lint_fixtures(plugin_dir):
+    linter = plugin_dir / "skills" / "tech-doc-style" / "scripts" / "lint_style.py"
+    for name, expected in LINT_FIXTURES.items():
+        fx = plugin_dir / "evals" / "fixtures" / name
+        r = subprocess.run([sys.executable, str(linter), "--format", "json", str(fx)], capture_output=True, text=True)
+        if r.returncode:
+            err(f"lint_style.py failed on {name}: {r.stderr.strip()}")
+            continue
+        got = {f["rule"] for f in json.loads(r.stdout)}
+        if not expected and got:
+            err(f"lint_style.py on {name}: expected no findings, got {sorted(got)}")
+        missing = set(expected) - got
+        if missing:
+            err(f"lint_style.py on {name}: missing rules {sorted(missing)}")
+
+
 def main():
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     check_manifests()
@@ -166,14 +252,20 @@ def main():
             count += 1
             text = skill_md.read_text(encoding="utf-8")
             check_skill_common(plugin_dir.name, d, text, readme)
+            check_entry_reference(plugin_dir.name, d, text)
             if plugin_dir.name == "sre-docs":
                 check_docs_skill(d, text)
-            elif plugin_dir.name == "sre-kernel":
-                check_kernel_skill(plugin_dir, d, text)
+            if plugin_dir.name in EVAL_PLUGINS:
+                check_scripts_and_evals(plugin_dir, d)
         if plugin_dir.name == "sre-kernel":
             check_kernel_fixtures(plugin_dir)
+        elif plugin_dir.name == "tech-docs":
+            check_lint_fixtures(plugin_dir)
 
-    print(f"checked {count} skills")
+    total = sum(DESCRIPTION_LENGTHS)
+    if total > MAX_DESCRIPTION_TOTAL:
+        err(f"descriptions total {total} chars (> {MAX_DESCRIPTION_TOTAL}, Codex budget)")
+    print(f"checked {count} skills; descriptions total {total}/{MAX_DESCRIPTION_TOTAL} chars")
     if errors:
         print("\n".join(f"  ✗ {e}" for e in errors))
         sys.exit(1)

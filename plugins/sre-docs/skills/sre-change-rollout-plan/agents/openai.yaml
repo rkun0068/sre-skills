@@ -1,0 +1,6 @@
+# Codex / ChatGPT skill metadata. Claude Code ignores this file.
+interface:
+  display_name: "SRE change rollout plan"
+  short_description: "Draft or review a staged security rollout plan"
+policy:
+  allow_implicit_invocation: true

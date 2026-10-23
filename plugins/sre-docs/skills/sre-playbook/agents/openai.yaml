@@ -1,0 +1,6 @@
+# Codex / ChatGPT skill metadata. Claude Code ignores this file.
+interface:
+  display_name: "SRE playbook"
+  short_description: "Draft or review a task-level runbook"
+policy:
+  allow_implicit_invocation: true

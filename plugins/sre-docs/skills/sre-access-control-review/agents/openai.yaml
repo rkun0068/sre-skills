@@ -1,0 +1,6 @@
+# Codex / ChatGPT skill metadata. Claude Code ignores this file.
+interface:
+  display_name: "SRE access control review"
+  short_description: "Draft or review a least-privilege access design"
+policy:
+  allow_implicit_invocation: true

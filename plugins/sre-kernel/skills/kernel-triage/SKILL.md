@@ -1,7 +1,7 @@
 ---
 name: kernel-triage
 description: >-
-  CRITICAL — entry point and execution protocol for every sre-kernel skill. Triages a Linux host (RHEL-family or Ubuntu, physical or VM) over SSH with read-only scripts — kernel version, reboots, taint, kernel log signatures, kdump/pstore state, hardware error counters, pressure — then routes to crash, hang, or performance analysis. Defines the SSH execution rules, read-only default, confirmation gate for state-changing or high-overhead actions, and the report format. TRIGGER when: the user reports a Linux host problem with a host/IP (机器卡、负载高、意外重启、宕机、内核报错、dmesg 报错、kernel 问题), asks to 排查内核/系统问题, or any other kernel-* skill is about to run. DO NOT TRIGGER when: the problem is clearly in application code or logs, inside a container/Kubernetes workload, or the user only wants a document written (use sre-docs skills).
+  Entry point and execution protocol for kernel-* skills: read-only SSH triage of a Linux host (RHEL or Ubuntu) covering reboots, taint, kernel log signatures, kdump, hardware errors, pressure, then routing. TRIGGER when: the user reports a Linux host problem (宕机、意外重启、机器卡、内核报错). DO NOT TRIGGER when: the issue is in app code, containers, or only a document is wanted.
 ---
 
 # 内核问题分诊（入口 + 执行协议）
@@ -11,9 +11,9 @@ description: >-
 ## 执行协议
 
 1. **确认目标**：复述主机、问题现象、开始时间（带时区）。主机名或 IP 不清楚时直接询问，不要猜测。
-2. **连接方式**：使用用户本机已有的 SSH 配置和 agent。Claude 不输入、不索要密码。
+2. **连接方式**：使用用户本机已有的 SSH 配置和 agent。Agent 不输入、不索要密码。
    ```bash
-   ssh -o BatchMode=yes -o ConnectTimeout=10 <host> 'bash -s' < scripts/collect_baseline.sh
+   ssh -o BatchMode=yes -o ConnectTimeout=10 <host> 'bash -s' < SKILL_DIR/scripts/collect_baseline.sh
    ```
    - 只有在用户确认可以免密 sudo 时，才使用 `'sudo -n bash -s'`。不是 root 时，`dmesg`、`/proc/<pid>/stack` 等输出可能受限，报告里要注明"受权限限制未采集"。
    - 脚本放在本机，通过 stdin 传给远端执行，不往生产机上拷贝文件。
@@ -24,8 +24,9 @@ description: >-
    - 安装软件包或 debuginfo、修改 sysctl 或配置、加载或卸载模块、`drop_caches`；
    - kill 进程、重启服务或主机、开启或修改 kdump；
    - 从生产机拷出 vmcore 等大文件（占用带宽）。
-5. **转入安全事件**：发现入侵迹象（未知内核模块、被篡改的二进制、可疑外连、日志被清空）时，停止常规排障，提醒用户转到 `sre-docs:sre-incident-doc` 的 OpSec 流程：先保全证据，不要清理现场。
+5. **转入安全事件**：发现入侵迹象（未知内核模块、被篡改的二进制、可疑外连、日志被清空）时，停止常规排障，提醒用户转到 `sre-incident-doc` 的 OpSec 流程：先保全证据，不要清理现场。
 6. **分析位置**：vmcore 分析和 debuginfo 安装放在独立分析机上，不在受影响的生产机上做。
+7. **路径约定**：`SKILL_DIR` 指当前 SKILL.md 所在的目录。文中的 `scripts/`、`references/` 都相对于 `SKILL_DIR`。Claude Code 和 Codex 执行命令时，当前目录是用户的工作目录，而不是 skill 目录，所以运行脚本时要把 `SKILL_DIR` 换成该目录的绝对路径。引用同一 plugin 中其他 skill 的脚本时，写成 `SKILL_DIR/../<skill>/scripts/...`。
 
 ## 分诊流程
 
@@ -39,7 +40,7 @@ description: >-
 - [ ] 5. 按"报告格式"输出
 ```
 
-解码 taint（在本机执行）：`python3 scripts/decode_taint.py <tainted 值>`
+解码 taint（在本机执行）：`python3 SKILL_DIR/scripts/decode_taint.py TAINTED_VALUE`
 
 ## 分流
 
@@ -73,7 +74,7 @@ description: >-
 
 ## 和 sre-docs 的衔接
 
-- SEV0/1 或安全事件 → `sre-docs:sre-incident-doc`
-- 可复用的排查步骤 → `sre-docs:sre-playbook`
-- 结束后复盘 → `sre-docs:sre-postmortem`
-- 需要升级内核或修改参数 → `sre-docs:sre-change-rollout-plan`
+- SEV0/1 或安全事件 → `sre-incident-doc`
+- 可复用的排查步骤 → `sre-playbook`
+- 结束后复盘 → `sre-postmortem`
+- 需要升级内核或修改参数 → `sre-change-rollout-plan`

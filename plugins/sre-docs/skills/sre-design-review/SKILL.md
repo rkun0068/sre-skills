@@ -1,7 +1,7 @@
 ---
 name: sre-design-review
 description: >-
-  Draft or review a standardized security & reliability design document following Google's "Building Secure and Reliable Systems" (Part II) — requirements incl. nonfunctional ones, scalability, redundancy, dependencies, data integrity, SLOs, security/privacy, least privilege, understandability, resilience (degradation, blast radius, failure domains), design for recovery, DoS defense, logging/investigability, and tradeoff analysis. TRIGGER when: the user asks for a 设计文档, 技术方案, design doc, architecture review, 生产就绪评审 (PRR), 安全设计评审, or wants to check a design for reliability/security gaps. DO NOT TRIGGER when: only a threat model (sre-threat-model), only an access-control design (sre-access-control-review), or only a rollout plan (sre-change-rollout-plan) is wanted — this skill links to those instead of duplicating them.
+  Drafts or reviews a security and reliability design doc (设计文档/技术方案/PRR): requirements, SLOs, dependencies, data integrity, least privilege, resilience, recovery, DoS, logging, trade-offs. TRIGGER when: the user asks for a design doc or architecture review. DO NOT TRIGGER when: only a threat model, access-control design, or rollout plan is wanted.
 ---
 
 # 安全与可靠性设计文档

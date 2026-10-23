@@ -26,7 +26,7 @@
 ssh <host> 'echo w | sudo -n tee /proc/sysrq-trigger >/dev/null; sudo -n dmesg -T | tail -300'
 ```
 
-## 禁止由 Claude 发起的键
+## 禁止由 Agent 发起的键
 
 | 键 | 原因 |
 |---|---|

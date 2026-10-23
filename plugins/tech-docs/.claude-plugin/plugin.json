@@ -1,0 +1,5 @@
+{
+  "name": "tech-docs",
+  "version": "0.1.0",
+  "description": "Write and review developer and end-user documentation in Google developer documentation style, in English or Chinese, with doc-type templates and a Markdown style linter."
+}

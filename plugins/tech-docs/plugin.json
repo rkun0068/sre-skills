@@ -1,0 +1,20 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "tech-docs",
+  "version": "0.1.0",
+  "description": "Write and review developer and end-user documentation in Google developer documentation style, in English or Chinese, with doc-type templates and a Markdown style linter.",
+  "repository": "https://github.com/rkun0068/sre-skills",
+  "keywords": [
+    "documentation",
+    "technical-writing",
+    "style-guide"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Tech Docs",
+        "category": "Productivity"
+      }
+    }
+  }
+}

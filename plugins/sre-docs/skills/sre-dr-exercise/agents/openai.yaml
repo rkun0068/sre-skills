@@ -1,0 +1,6 @@
+# Codex / ChatGPT skill metadata. Claude Code ignores this file.
+interface:
+  display_name: "SRE DR exercise"
+  short_description: "Plan and report a DR or tabletop exercise"
+policy:
+  allow_implicit_invocation: true

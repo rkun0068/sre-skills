@@ -1,0 +1,6 @@
+# Codex / ChatGPT skill metadata. Claude Code ignores this file.
+interface:
+  display_name: "SRE incident response plan"
+  short_description: "Draft an IR team charter and response plan"
+policy:
+  allow_implicit_invocation: true
