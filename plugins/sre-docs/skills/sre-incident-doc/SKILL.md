@@ -1,7 +1,7 @@
 ---
 name: sre-incident-doc
 description: >-
-  Create or maintain a standardized live incident command document following Google's "Building Secure and Reliable Systems" (Ch17 Crisis Management) — triage (is it a crisis), explicit declaration and IC acceptance, IMAG roles, rules of engagement and OpSec, investigation tracks (forensics / reversing / hunting), forensic timeline, IC loop status updates, kickoff / sync / handover meeting agendas, audience-tailored communications, customer notice draft, and closure criteria. TRIGGER when: the user says an incident/outage/compromise is happening, asks to 开事件文档, 事故作战室文档, incident doc, war room notes, 事件状态更新, 交接班, 对外通报草稿, or wants help running incident meetings. DO NOT TRIGGER when: the incident is over and a postmortem is wanted (sre-postmortem), or a recovery/remediation plan is being written (sre-recovery-plan, which this doc links to).
+  Creates or maintains a live incident command doc (事件文档/作战室): triage, declaration, IC and roles, OpSec, investigation tracks, timeline, status updates, meeting and handover agendas, comms. TRIGGER when: an incident or outage is happening now. DO NOT TRIGGER when: the incident is over (sre-postmortem) or a recovery plan is being written.
 ---
 
 # 事件指挥工作文档

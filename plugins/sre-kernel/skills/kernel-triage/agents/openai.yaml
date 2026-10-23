@@ -1,0 +1,6 @@
+# Codex / ChatGPT skill metadata. Claude Code ignores this file.
+interface:
+  display_name: "Kernel triage"
+  short_description: "Read-only Linux host triage over SSH"
+policy:
+  allow_implicit_invocation: true

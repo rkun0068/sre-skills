@@ -1,7 +1,7 @@
 ---
 name: sre-doc-standards
 description: >-
-  CRITICAL — every sre-* document skill depends on this. Shared conventions for SRE / security-reliability documents derived from Google's "Building Secure and Reliable Systems" — metadata header, document status lifecycle, severity (SEV0–4) and priority (P0–4) models, probability×impact risk scoring, action-item format, confirmed-vs-unconfirmed writing rules, sensitivity labels, and IOC defanging. TRIGGER when: any sre-* skill is loaded; the user asks to write, standardize, or review any SRE/security/reliability document (设计文档、威胁建模、事件、复盘、预案、演练、风险评估); or asks what severity/priority/risk scale to use. DO NOT TRIGGER when: the task is general coding with no document output, or the user asks for a non-SRE document such as marketing copy.
+  Shared conventions for every sre-* document skill: metadata header, SEV0-4 and P0-4 models, probability x impact risk scoring, action-item format, writing rules. TRIGGER when: any sre-* document skill runs, or the user asks which severity, priority, or risk scale to use. DO NOT TRIGGER when: no SRE document is involved.
 ---
 
 # SRE 文档共享约定
@@ -97,7 +97,7 @@ BSRS 把**严重度**（影响有多大）和**优先级**（要多快响应）�
 
 1. **确认文档类型**：根据用户意图选择对应的 `sre-*` skill；若跨多个类型（例如"事故复盘 + 恢复计划"），分别产出并互相链接。
 2. **收集输入**：先读用户提供的材料（代码、架构图、日志、聊天记录、旧文档）。缺失的关键信息集中列成问题一次性询问，不要逐条打断。
-3. **复制模板**：从对应 skill 的 `assets/template.md` 起草，保留全部章节标题。
+3. **复制模板**：从对应 skill 的 `assets/template.md` 起草，保留全部章节标题。模板路径相对于该 skill 的 SKILL.md 所在目录，而不是当前工作目录。
 4. **填充**：按 skill 中的方法论填写；无法确认的信息标记 `TODO(owner): ...`，不要编造数据、人名、指标或时间。
 5. **自检**：逐条执行该 skill 的"质量门禁"清单，以及本文件第 1、4、5 节，把未通过项列给用户。
 6. **输出**：默认写入用户仓库中的 Markdown 文件（如 `docs/<type>/<yyyy-mm-dd>-<slug>.md`），并在回复中给出未完成项摘要。

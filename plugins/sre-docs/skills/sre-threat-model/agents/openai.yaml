@@ -1,0 +1,6 @@
+# Codex / ChatGPT skill metadata. Claude Code ignores this file.
+interface:
+  display_name: "SRE threat model"
+  short_description: "Draft or review a threat model"
+policy:
+  allow_implicit_invocation: true

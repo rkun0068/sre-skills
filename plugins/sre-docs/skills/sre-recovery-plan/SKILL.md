@@ -1,7 +1,7 @@
 ---
 name: sre-recovery-plan
 description: >-
-  Draft or review a standardized incident recovery plan and recovery checklist following Google's "Building Secure and Reliable Systems" (Ch18 Recovery and Aftermath) — recovery team and remediation lead, timeline, scoping (inventory, TTPs, downstream impact), attacker reaction, compromised comms and tooling, clean environments, variants and reintroduced vulnerabilities, mitigation tradeoffs, ordered checklist with commands and rollback, isolation/quarantine, rebuilds, data sanitization and provenance, backup selection, credential and secret rotation. TRIGGER when: the user asks for 恢复计划, 修复方案 after a compromise or major outage, remediation plan, eviction plan, 凭据轮换计划, 重建方案, or a recovery checklist. DO NOT TRIGGER when: the incident is still being triaged/investigated (sre-incident-doc), or the user wants a generic reusable procedure (sre-playbook).
+  Drafts or reviews a post-compromise or major-outage recovery plan (恢复计划): scoping, clean rebuilds, data sanitization, backup selection, credential rotation, ordered checklist with rollback. TRIGGER when: the user asks for a remediation, eviction, or 凭据轮换 plan. DO NOT TRIGGER when: the incident is still being triaged (sre-incident-doc).
 ---
 
 # 恢复计划与恢复清单

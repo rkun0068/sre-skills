@@ -1,7 +1,7 @@
 ---
 name: kernel-hang-analysis
 description: >-
-  Diagnoses Linux kernel hangs and stalls on RHEL-family and Ubuntu hosts — soft lockup, hard lockup (NMI watchdog), hung task (blocked for more than N seconds), RCU stalls, and pile-ups of D-state (uninterruptible) processes — by classifying the stall, snapshotting blocked tasks and their kernel stacks read-only, and mapping wait points to IO, NFS, locks, memory reclaim, or VM steal. TRIGGER when: logs show soft lockup / hard LOCKUP / blocked for more than / rcu stall, the user reports 机器卡死、命令卡住、进程 D 状态、load 很高但 CPU 不忙、ssh 能连但操作无响应, or kernel-triage routes here. DO NOT TRIGGER when: the host crashed or rebooted (kernel-crash-analysis) or is just slow with busy CPUs (kernel-perf-analysis).
+  Diagnoses Linux kernel hangs: soft and hard lockups, hung tasks, RCU stalls, D-state pile-ups. Snapshots blocked tasks read-only and maps wait points to IO, NFS, locks, reclaim, or VM steal. TRIGGER when: logs show lockups or 'blocked for more than', or 机器卡死/load 高但 CPU 空闲. DO NOT TRIGGER when: the host crashed or is just CPU-bound.
 ---
 
 # 内核卡死 / 停顿分析
@@ -33,7 +33,7 @@ description: >-
 ### 2. 采集快照
 
 ```bash
-ssh -o BatchMode=yes <host> 'bash -s' < scripts/hang_snapshot.sh
+ssh -o BatchMode=yes <host> 'bash -s' < SKILL_DIR/scripts/hang_snapshot.sh
 ```
 
 采集内容包括：

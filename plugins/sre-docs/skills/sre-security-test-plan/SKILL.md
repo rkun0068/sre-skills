@@ -1,7 +1,7 @@
 ---
 name: sre-security-test-plan
 description: >-
-  Draft or review a standardized security & reliability test plan following Google's "Building Secure and Reliable Systems" (Ch12 Writing Code, Ch13 Testing Code) — secure-by-default frameworks, unit tests with security edge cases, hermetic integration tests without production data, sanitizers, continuous fuzzing, static analysis / linters / abstract interpretation / formal methods, and how each is wired into CI and code review. TRIGGER when: the user asks for 测试计划, 安全测试方案, fuzz 计划, 静态扫描接入方案, test strategy for a security-sensitive component, or a review of test coverage for security/reliability. DO NOT TRIGGER when: the user just wants a specific unit test written, or is planning DR drills / tabletop exercises (sre-dr-exercise).
+  Drafts or reviews a security and reliability test plan (测试计划): secure-by-default frameworks, unit and integration tests, sanitizers, fuzzing, static analysis, CI gates. TRIGGER when: the user asks for a test strategy, fuzz plan, or 静态扫描接入. DO NOT TRIGGER when: writing one specific test or planning DR drills (sre-dr-exercise).
 ---
 
 # 安全与可靠性测试计划

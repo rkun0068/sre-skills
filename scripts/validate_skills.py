@@ -9,6 +9,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 PLUGINS = ROOT / "plugins"
 MAX_SKILL_LINES = 500
+# Codex lists every skill's description within ~8,000 characters (2% of context when unknown)
+MAX_DESCRIPTION = 400
+MAX_DESCRIPTION_TOTAL = 8000
+# agent-neutral bodies: no plugin-prefixed skill names, no cwd-relative runnable script paths
+RE_PLUGIN_PREFIX = re.compile(r"\b(?:sre-docs|sre-kernel|tech-docs):[a-z]")
+RE_BARE_SCRIPT_RUN = re.compile(r"(?:python3\s+|bash\s+|<\s*|^\s*)(?:\./)?(?:\.\./[\w-]+/)?scripts/[\w.-]+\.(?:sh|py)", re.M)
+RE_AGENT_NAME = re.compile(r"\b(Claude|Codex|ChatGPT)\b")
+AGENT_NAME_OK = "Claude Code 和 Codex"
 
 DOCS_SHARED = "sre-doc-standards"
 DOCS_METADATA = ["文档类型", "标题", "状态", "密级", "Owner", "创建日期", "最后更新"]
@@ -41,6 +49,7 @@ LINT_FIXTURES = {
 }
 
 errors = []
+DESCRIPTION_LENGTHS = []
 
 
 def err(msg):
@@ -65,16 +74,36 @@ def frontmatter(text):
 def check_manifests():
     mp = json.loads((ROOT / ".claude-plugin" / "marketplace.json").read_text())
     listed = {p["name"]: p["source"] for p in mp["plugins"]}
+    cx = json.loads((ROOT / ".agents" / "plugins" / "marketplace.json").read_text())
+    cx_listed = {}
+    for p in cx["plugins"]:
+        cx_listed[p["name"]] = p["source"].get("path")
+        for field in ("policy", "category"):
+            if field not in p:
+                err(f"codex marketplace: {p['name']} missing {field}")
+        if not {"installation", "authentication"} <= set(p.get("policy", {})):
+            err(f"codex marketplace: {p['name']} policy needs installation and authentication")
+    if cx_listed != listed:
+        err(f"codex marketplace plugins {cx_listed} differ from claude marketplace {listed}")
     for d in sorted(p for p in PLUGINS.iterdir() if p.is_dir()):
         if d.name not in listed:
             err(f"{d.name}: plugin not listed in marketplace.json")
         elif (ROOT / listed[d.name]).resolve() != d.resolve():
             err(f"{d.name}: marketplace source {listed[d.name]} does not point to {d}")
-        pj = d / ".claude-plugin" / "plugin.json"
-        if not pj.exists():
-            err(f"{d.name}: missing .claude-plugin/plugin.json")
-        elif json.loads(pj.read_text()).get("name") != d.name:
-            err(f"{d.name}: plugin.json name mismatch")
+        manifests = {}
+        for rel in (".claude-plugin/plugin.json", "plugin.json"):
+            pj = d / rel
+            if not pj.exists():
+                err(f"{d.name}: missing {rel}")
+                continue
+            manifests[rel] = json.loads(pj.read_text())
+            for field in ("name", "version", "description"):
+                if not manifests[rel].get(field):
+                    err(f"{d.name}: {rel} missing {field}")
+            if manifests[rel].get("name") != d.name:
+                err(f"{d.name}: {rel} name mismatch")
+        if len({m.get("version") for m in manifests.values()}) > 1:
+            err(f"{d.name}: plugin.json and .claude-plugin/plugin.json versions differ")
     for name in listed:
         if not (PLUGINS / name).is_dir():
             err(f"marketplace lists missing plugin {name}")
@@ -89,8 +118,32 @@ def check_skill_common(plugin, d, text, readme):
     desc = fm.get("description", "")
     if not desc:
         err(f"{plugin}/{d.name}: empty description")
-    elif len(desc) > 1024:
-        err(f"{plugin}/{d.name}: description is {len(desc)} chars (> 1024)")
+    elif len(desc) > MAX_DESCRIPTION:
+        err(f"{plugin}/{d.name}: description is {len(desc)} chars (> {MAX_DESCRIPTION}, Codex budget)")
+    DESCRIPTION_LENGTHS.append(len(desc))
+    if set(fm) - {"name", "description"}:
+        err(f"{plugin}/{d.name}: frontmatter has fields other than name/description: {sorted(set(fm) - {'name', 'description'})}")
+    oy = d / "agents" / "openai.yaml"
+    if not oy.exists():
+        err(f"{plugin}/{d.name}: missing agents/openai.yaml")
+    else:
+        y = oy.read_text()
+        for key in ("display_name:", "short_description:", "allow_implicit_invocation:"):
+            if key not in y:
+                err(f"{plugin}/{d.name}: agents/openai.yaml missing {key}")
+    for md in [d / "SKILL.md", *sorted((d / "references").glob("*.md"))]:
+        body = md.read_text(encoding="utf-8")
+        if md.name == "SKILL.md":
+            body = body.split("\n---\n", 1)[-1]
+        rel = md.relative_to(d)
+        if RE_PLUGIN_PREFIX.search(body):
+            err(f"{plugin}/{d.name}/{rel}: use bare skill names, not plugin-prefixed names")
+        for m in RE_BARE_SCRIPT_RUN.finditer(body):
+            line = body[body.rfind("\n", 0, m.start()) + 1: body.find("\n", m.end())]
+            if "SKILL_DIR" not in line and "decode_stacktrace" not in line:
+                err(f"{plugin}/{d.name}/{rel}: runnable script path without SKILL_DIR: {line.strip()[:80]}")
+        if RE_AGENT_NAME.search(body.replace(AGENT_NAME_OK, "")):
+            err(f"{plugin}/{d.name}/{rel}: names a specific agent; keep instructions agent-neutral")
     for kw in ("TRIGGER when", "DO NOT TRIGGER when"):
         if kw not in desc:
             err(f"{plugin}/{d.name}: description missing '{kw}'")
@@ -209,7 +262,10 @@ def main():
         elif plugin_dir.name == "tech-docs":
             check_lint_fixtures(plugin_dir)
 
-    print(f"checked {count} skills")
+    total = sum(DESCRIPTION_LENGTHS)
+    if total > MAX_DESCRIPTION_TOTAL:
+        err(f"descriptions total {total} chars (> {MAX_DESCRIPTION_TOTAL}, Codex budget)")
+    print(f"checked {count} skills; descriptions total {total}/{MAX_DESCRIPTION_TOTAL} chars")
     if errors:
         print("\n".join(f"  ✗ {e}" for e in errors))
         sys.exit(1)

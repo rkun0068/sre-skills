@@ -1,0 +1,44 @@
+{
+  "name": "sre-skills",
+  "interface": {
+    "displayName": "SRE Skills"
+  },
+  "plugins": [
+    {
+      "name": "sre-docs",
+      "source": {
+        "source": "local",
+        "path": "./plugins/sre-docs"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "sre-kernel",
+      "source": {
+        "source": "local",
+        "path": "./plugins/sre-kernel"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "tech-docs",
+      "source": {
+        "source": "local",
+        "path": "./plugins/tech-docs"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

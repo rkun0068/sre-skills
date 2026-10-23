@@ -1,7 +1,7 @@
 ---
 name: sre-dr-exercise
 description: >-
-  Draft or review a standardized disaster-recovery / incident-response exercise plan and after-action report following Google's "Building Secure and Reliable Systems" (Ch16 Testing Systems and Response Plans, Ch8 continuous validation) — audits of backups/logs/patching/alerts/comms, tabletop exercises (believable scenario, artifacts, 10–20 decision points, cross-functional participants, interactivity), production tests (fault injection, people-unavailable, multi-component, region failover), red team exercises, stage-by-stage measurement, and feedback loops. TRIGGER when: the user asks for 演练计划, 容灾演练, 桌面推演, tabletop, game day, 故障注入演练, 红蓝对抗方案, 演练报告/总结. DO NOT TRIGGER when: the user wants a real incident's postmortem (sre-postmortem) or code-level test plan (sre-security-test-plan).
+  Drafts or reviews a DR or incident-response exercise plan and report (演练计划/桌面推演/game day): audits, tabletops, fault injection, failover tests, red team, stage timing, follow-ups. TRIGGER when: the user asks for 容灾演练, tabletop, or 演练报告. DO NOT TRIGGER when: a real incident postmortem or code test plan is wanted.
 ---
 
 # 演练计划与演练报告

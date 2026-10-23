@@ -1,0 +1,6 @@
+# Codex / ChatGPT skill metadata. Claude Code ignores this file.
+interface:
+  display_name: "Kernel crash analysis"
+  short_description: "Analyze oops, panic, vmcore, and unexpected reboots"
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,6 @@
+# Codex / ChatGPT skill metadata. Claude Code ignores this file.
+interface:
+  display_name: "Tech doc style"
+  short_description: "Apply and lint Google developer doc style"
+policy:
+  allow_implicit_invocation: true

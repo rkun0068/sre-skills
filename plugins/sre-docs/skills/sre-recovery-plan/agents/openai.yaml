@@ -1,0 +1,6 @@
+# Codex / ChatGPT skill metadata. Claude Code ignores this file.
+interface:
+  display_name: "SRE recovery plan"
+  short_description: "Plan recovery after a compromise or major outage"
+policy:
+  allow_implicit_invocation: true

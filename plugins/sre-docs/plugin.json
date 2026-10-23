@@ -1,0 +1,21 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "sre-docs",
+  "version": "0.1.0",
+  "description": "Draft and review standardized SRE / security-reliability documents based on Google's Building Secure and Reliable Systems.",
+  "repository": "https://github.com/rkun0068/sre-skills",
+  "keywords": [
+    "sre",
+    "documentation",
+    "reliability",
+    "security"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "SRE Docs",
+        "category": "Productivity"
+      }
+    }
+  }
+}

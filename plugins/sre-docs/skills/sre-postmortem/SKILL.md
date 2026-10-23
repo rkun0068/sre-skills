@@ -1,7 +1,7 @@
 ---
 name: sre-postmortem
 description: >-
-  Draft or review a standardized blameless postmortem following Google's "Building Secure and Reliable Systems" (Ch18 After the Recovery, Ch16 Evaluating Responses) — summary, impact, timeline, per-stage response timing, contributing factors and similar issues elsewhere, detection effectiveness, data protection, tooling usability, bypassed procedures, temporary changes to refactor, what went well, and short-term vs long-term action items with owners. TRIGGER when: the user asks for 复盘, 事后分析, postmortem, PIR, incident review, 故障报告, 安全事件总结, or to review an existing postmortem. DO NOT TRIGGER when: the incident is still active (sre-incident-doc) or the user wants an exercise report (sre-dr-exercise).
+  Drafts or reviews a blameless postmortem (复盘/故障报告): impact, timeline, response timing, contributing factors, detection gaps, short- and long-term action items with owners. TRIGGER when: the user asks for a postmortem, PIR, or 事故总结. DO NOT TRIGGER when: the incident is still active (sre-incident-doc) or for exercise reports.
 ---
 
 # 无责事后复盘

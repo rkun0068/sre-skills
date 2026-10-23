@@ -1,0 +1,6 @@
+# Codex / ChatGPT skill metadata. Claude Code ignores this file.
+interface:
+  display_name: "Kernel hang analysis"
+  short_description: "Diagnose lockups, hung tasks, and D-state pile-ups"
+policy:
+  allow_implicit_invocation: true

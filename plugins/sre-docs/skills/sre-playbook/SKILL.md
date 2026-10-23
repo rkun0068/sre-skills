@@ -1,7 +1,7 @@
 ---
 name: sre-playbook
 description: >-
-  Draft or review a standardized task-level playbook / runbook following Google's "Building Secure and Reliable Systems" (Ch16 playbooks, Ch9 emergency access, Ch17 OpSec) — trigger and scope, prerequisites and pre-approved access, step-by-step commands with expected output and verification, decision points, security/OpSec cautions, rollback, escalation time limits, low-dependency fallbacks, and offline availability. TRIGGER when: the user asks for a playbook, runbook, SOP, 操作手册, 应急手册, 故障处理手册, 切换手册, breakglass 操作步骤, or wants an alert linked to handling steps. DO NOT TRIGGER when: the user needs the overall IR process (sre-incident-response-plan) or a recovery plan for a specific ongoing compromise (sre-recovery-plan).
+  Drafts or reviews a task-level playbook or runbook (操作手册/应急手册/SOP): trigger, prerequisites, copyable steps with verification, decision points, OpSec, rollback, escalation. TRIGGER when: the user asks for a playbook, runbook, or SOP. DO NOT TRIGGER when: the overall IR process (sre-incident-response-plan) is wanted.
 ---
 
 # 操作手册（Playbook / Runbook）

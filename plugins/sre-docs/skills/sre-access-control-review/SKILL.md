@@ -1,7 +1,7 @@
 ---
 name: sre-access-control-review
 description: >-
-  Draft or review a standardized least-privilege / access-control design document following Google's "Building Secure and Reliable Systems" (Ch5 Design for Least Privilege, Ch3 Safe Proxies) — risk-based access classification, small functional APIs, zero trust / zero touch, authorization policy, multi-party authorization, business justification, temporary access, proxies, breakglass, auditing, and denial diagnostics. TRIGGER when: the user asks for 权限设计, 访问控制方案, 最小权限评审, IAM / RBAC design, 生产访问管控, breakglass / 应急权限设计, or an access review of a system. DO NOT TRIGGER when: the task is a one-off permission request or grant, or a full design doc (sre-design-review links here).
+  Drafts or reviews a least-privilege access-control design (权限设计): risk-based access tiers, authorization policy, MPA, temporary access, proxies, breakglass, auditing. TRIGGER when: the user asks for IAM/RBAC design, 最小权限评审, or production access controls. DO NOT TRIGGER when: it is a one-off permission request or a full design doc.
 ---
 
 # 最小权限 / 访问控制设计
