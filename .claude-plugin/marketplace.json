@@ -4,7 +4,7 @@
     "name": "yukun.song"
   },
   "metadata": {
-    "description": "SRE skills: standardized security & reliability documents and Linux kernel troubleshooting."
+    "description": "SRE skills: standardized security & reliability documents, Linux kernel troubleshooting, and developer documentation in Google style."
   },
   "plugins": [
     {
@@ -16,6 +16,11 @@
       "name": "sre-kernel",
       "source": "./plugins/sre-kernel",
       "description": "Read-only Linux kernel troubleshooting over SSH: triage, oops/panic/vmcore analysis, lockup and hung-task analysis, USE-method performance analysis."
+    },
+    {
+      "name": "tech-docs",
+      "source": "./plugins/tech-docs",
+      "description": "Write and review developer and end-user documentation (README, quickstart, how-to, tutorial, concept, reference, troubleshooting, release notes) in Google developer documentation style, in English or Chinese."
     }
   ]
 }

@@ -1,0 +1,43 @@
+{
+  "skill_name": "tech-doc-style",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "帮我按 Google 风格检查一下这篇 quickstart",
+      "files": ["../fixtures/bad-en.md"],
+      "expected_output": "运行 lint_style.py，按 error → warn → info 列出问题（whitelist、Title Case 标题、please note/currently/simply、below、click on、e.g.、<your-token> 与 YOUR_ 占位符、click here 链接、03/04/2026、缺 alt text、两个 h1、夸大断言），附原文位置与修改建议；不直接重写全文。",
+      "expectations": [
+        "运行 scripts/lint_style.py，而不是只凭阅读判断",
+        "把 whitelist 列为最高优先级（error）",
+        "指出标题应使用 sentence case，且不以 -ing 开头",
+        "指出占位符应改为 UPPER_SNAKE_CASE，并在代码块后用 Replace the following 解释",
+        "指出 'here' 链接文字和缺失的 alt text",
+        "评审模式下不直接重写全文，而是给出带位置的修改建议"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "这段中文文档帮我润色一下，符合规范",
+      "files": ["../fixtures/bad-zh.md"],
+      "expected_output": "按中文适配规则修改：中英文和数字之间加空格、全角标点、去掉“我们/只需/轻松/请注意/目前/下面”、白名单改为允许名单、感叹号删除、占位符改为 TOKEN 并解释、链接文字改为目标页面标题、标题去掉句号和“第一步”。",
+      "expectations": [
+        "读取 references/chinese-docs.md 并应用中文排版规则",
+        "修正中英文、数字之间的空格以及半角逗号",
+        "删除“只需”“轻松”“请注意”“目前”等措辞，并把“我们”改为“你”",
+        "把“白名单”改为“允许名单”",
+        "把 <token> 改为 UPPER_SNAKE_CASE 占位符并加以解释"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "lint 报了 en-hang，但我写的是 kernel hang 的排查文档，必须改吗？",
+      "files": [],
+      "expected_output": "解释 lint 是辅助手段：en-hang 是 info 级别；在技术语境下描述内核现象时可以保留，或者改为更精确的 'stops responding'/'soft lockup'，但不需要硬改；在评审意见里说明理由即可。",
+      "expectations": [
+        "说明 en-hang 是 info 级别，属于可选修改",
+        "承认在内核排障的语境下这可能是误报",
+        "给出更精确的替代说法供参考，但不强制修改"
+      ]
+    }
+  ]
+}

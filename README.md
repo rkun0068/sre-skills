@@ -6,6 +6,7 @@
 |---|---|---|
 | [sre-docs](plugins/sre-docs) | 按统一标准起草、补全和评审 SRE / 安全可靠性文档 | Google《[Building Secure and Reliable Systems](https://google.github.io/building-secure-and-reliable-systems/raw/toc.html)》（BSRS） |
 | [sre-kernel](plugins/sre-kernel) | 通过 SSH 对 Linux 主机（RHEL 系、Ubuntu）做只读的内核问题排查 | [内核 bug-hunting 指南](https://docs.kernel.org/translations/zh_CN/admin-guide/bug-hunting.html)、[Brendan Gregg Linux Performance](https://www.brendangregg.com/linuxperf.html)，并借鉴了 [intel/linux-kernel-oops](https://github.com/intel/linux-kernel-oops) 的设计 |
+| [tech-docs](plugins/tech-docs) | 按 Google 风格编写和评审开发者文档、用户文档（中英文） | [Google developer documentation style guide](https://developers.google.com/style) |
 
 ## 安装
 
@@ -15,6 +16,7 @@
 /plugin marketplace add /path/to/sre-skills
 /plugin install sre-docs@sre-skills
 /plugin install sre-kernel@sre-skills
+/plugin install tech-docs@sre-skills
 ```
 
 安装后，skill 带插件命名空间，例如 `sre-kernel:kernel-triage`。跨 plugin 引用时写 skill 名称，不写相对路径。
@@ -29,7 +31,8 @@
   - 模板放在 `assets/`。
 - **每个 plugin 有一个公共协议 skill**，同一 plugin 内的其他 skill 都要先读它，不得重新定义其中的约定：
   - sre-docs：`sre-doc-standards`（元数据头、严重度和优先级、风险打分、行动项、写作规范）；
-  - sre-kernel：`kernel-triage`（SSH 执行规则、默认只读、确认门、报告格式）。
+  - sre-kernel：`kernel-triage`（SSH 执行规则、默认只读、确认门、报告格式）；
+  - tech-docs：`tech-doc-style`（风格规则、lint、评审模式）。
 - **评估先行**：每个 skill 至少有 3 个评估场景，放在 `plugins/<plugin>/evals/`。
 
 ## sre-docs：文档 skill
@@ -99,6 +102,21 @@ kernel-triage：确认目标 → ssh -o BatchMode=yes <host> 'bash -s' < collect
 - 写操作和高开销操作必须逐项确认；
 - vmcore 和 debuginfo 只在独立分析机上处理。
 
+## tech-docs：技术文档 skill
+
+| Skill | 用途 | 内容 |
+|---|---|---|
+| [tech-doc-style](plugins/tech-docs/skills/tech-doc-style/SKILL.md) | 风格规则和评审：语气、语法、标题、列表、步骤、代码与占位符、链接、无障碍、包容性语言、不过时的措辞，以及中文排版适配 | `lint_style.py`；references 包括词汇表、格式、步骤、代码与命令、API 参考、无障碍、中文文档 |
+| [tech-doc-writing](plugins/tech-docs/skills/tech-doc-writing/SKILL.md) | 根据读者的需求选择文档类型，从代码中收集事实后起草，验证命令，最后运行 lint | 8 个模板：README、quickstart、how-to、tutorial、concept、reference、troubleshooting、release notes |
+
+lint 可以单独使用，也可以接入 CI：
+
+```bash
+python3 plugins/tech-docs/skills/tech-doc-style/scripts/lint_style.py --strict docs/
+```
+
+它会自动识别中英文，跳过代码块、行内代码和 URL，并在代码块中检查占位符的写法。语义层面的规则（例如语气、条件放在指令之前）仍需人工检查。
+
 ## 校验
 
 ```bash
@@ -112,10 +130,12 @@ python3 scripts/validate_skills.py
 - 文档模板与公共约定的引用；
 - 脚本语法与可执行权限；
 - evals 的数量和引用的样例文件；
-- 用 `extract_oops.py` 对样例日志做回归测试。
+- 用 `extract_oops.py` 对样例日志做回归测试；
+- 用 `lint_style.py` 对样例文档做回归测试：bad 样例必须报出指定的规则，good 样例不能有任何发现。
 
 ## 版权说明
 
 - sre-docs 是对 BSRS（CC BY-NC-ND 4.0）方法论的**中文转述与工程化整理**，不复制原文。
 - sre-kernel 引用的方法论来自上面列出的公开资料，各 skill 的"参考"一节附有原文链接。
+- tech-docs 是对 Google developer documentation style guide（CC BY 4.0）的中文转述与精简，不复制原文；词汇表和示例均为改写。
 - 样例日志全部为自行编写。

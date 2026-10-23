@@ -1,0 +1,42 @@
+{
+  "skill_name": "tech-doc-writing",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "给这个仓库写一个 README",
+      "files": [],
+      "expected_output": "先确认读者和语言；从代码、--help、CI 配置收集事实；使用 assets/readme.md 模板；命令经过验证或标为 TODO；运行 lint；回复中列出文件、文档类型理由、TODO 和未修改的 lint 条目。",
+      "expectations": [
+        "从仓库代码和配置中收集事实，而不是凭空编写",
+        "使用 assets/readme.md 的章节结构",
+        "无法确认的内容标注为 TODO，而不是编造 flag 或默认值",
+        "运行 ../tech-doc-style/scripts/lint_style.py 并处理 warn/error",
+        "回复中列出未完成的 TODO"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "帮我写一篇文档，既要讲清楚我们缓存层的设计原理，又要教用户怎么配置缓存，还要列出所有配置项",
+      "files": [],
+      "expected_output": "识别出这是三种需求，拆成概念文档（concept）、how-to 指南和参考文档（reference）三篇并互相链接，而不是写成一篇混合文档。",
+      "expectations": [
+        "把需求拆成 concept、how-to、reference 三篇",
+        "每篇分别使用对应的模板",
+        "三篇文档之间互相链接（What's next / For more information）"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Write a quickstart for deploying with `acme deploy`. Here's the help output: acme deploy --project PROJECT --region REGION [--dry-run]",
+      "files": [],
+      "expected_output": "An English quickstart from assets/quickstart.md: sentence-case task headings, Before you begin, numbered steps with one action each, a runnable command without [ ] syntax, placeholders PROJECT_ID/REGION explained with 'Replace the following:', a verification step, and What's next; optional --dry-run is left out of the copyable command or shown separately.",
+      "expectations": [
+        "Uses the quickstart template structure with Before you begin and What's next",
+        "Copyable command contains no [ ] syntax and uses UPPER_SNAKE_CASE placeholders",
+        "Explains placeholders after the code block with 'Replace the following:'",
+        "Headings are sentence case and start with a bare verb",
+        "Runs the linter and reports results"
+      ]
+    }
+  ]
+}
