@@ -1,7 +1,7 @@
 ---
 name: sre-disaster-risk-assessment
 description: >-
-  Draft or review a standardized disaster risk assessment following Google's "Building Secure and Reliable Systems" (Ch16 Disaster Planning, Appendix A Disaster Risk Assessment Matrix) — critical-system classification (mission-essential / important / nonessential), required resources, environmental / infrastructure / security risk themes, probability×impact scoring and ranking, outlier review, per-site assessment, and response-plan mapping. TRIGGER when: the user asks for 灾难风险评估, 风险矩阵, BCP/DR 风险分析, 业务连续性评估, 关键系统识别, or "which disasters should we plan for". DO NOT TRIGGER when: the user wants an adversary-focused threat model (sre-threat-model) or a single system's design review (sre-design-review).
+  Drafts or reviews a disaster risk assessment (灾难风险评估/风险矩阵): critical systems, environmental, infrastructure, and security risks scored by probability x impact, outlier review, response mapping. TRIGGER when: the user asks for BCP/DR risk analysis. DO NOT TRIGGER when: an adversary threat model (sre-threat-model) is wanted.
 ---
 
 # 灾难风险评估

@@ -1,0 +1,6 @@
+# Codex / ChatGPT skill metadata. Claude Code ignores this file.
+interface:
+  display_name: "SRE doc standards"
+  short_description: "Shared header, severity, risk, and action-item rules"
+policy:
+  allow_implicit_invocation: true

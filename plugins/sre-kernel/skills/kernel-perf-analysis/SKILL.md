@@ -1,7 +1,7 @@
 ---
 name: kernel-perf-analysis
 description: >-
-  Analyzes Linux host performance problems on RHEL-family and Ubuntu systems using Brendan Gregg's methodology — a time-bounded 60-second checklist, then the USE method (utilization, saturation, errors) per resource, then targeted drill-down into CPU/scheduler, memory/OOM killer, disk I/O, and network with tools tiered by overhead (procfs/sysstat → perf stat/top → perf record, bcc, bpftrace, flame graphs only after confirmation). TRIGGER when: the user reports 机器慢、负载高、CPU 高、内存不足、OOM、被 oom-kill、IO 慢、iowait 高、网络丢包/重传, asks for 性能分析、火焰图、USE 方法, or kernel-triage routes here. DO NOT TRIGGER when: the host crashed (kernel-crash-analysis), tasks are stuck in D state or lockups are logged (kernel-hang-analysis), or the slowness is inside one application's own code path with no host-level symptom.
+  Analyzes Linux host performance with the 60-second checklist and USE method, then CPU, memory and OOM, disk IO, and network drill-down, with tools tiered by overhead. TRIGGER when: the user reports 机器慢、负载高、OOM、IO 慢、丢包, or asks for a flame graph. DO NOT TRIGGER when: the host crashed, tasks are stuck in D state, or the slowness is inside one app.
 ---
 
 # 内核与系统性能分析
@@ -29,7 +29,7 @@ description: >-
 ### 2. 60 秒速查
 
 ```bash
-ssh -o BatchMode=yes <host> 'bash -s' < scripts/sixty_seconds.sh
+ssh -o BatchMode=yes <host> 'bash -s' < SKILL_DIR/scripts/sixty_seconds.sh
 ```
 
 脚本按顺序执行 10 条命令，每条都限定了时长：
@@ -54,7 +54,7 @@ top
 ### 3. USE 检查
 
 ```bash
-ssh -o BatchMode=yes <host> 'bash -s' < scripts/use_snapshot.sh
+ssh -o BatchMode=yes <host> 'bash -s' < SKILL_DIR/scripts/use_snapshot.sh
 ```
 
 对每种资源回答三个问题：
@@ -91,7 +91,7 @@ ssh -o BatchMode=yes <host> 'bash -s' < scripts/use_snapshot.sh
 
 结论要说明**因果关系**：哪个资源饱和 → 导致什么现象 → 有什么证据，而不是简单罗列异常指标。
 
-每条处置建议都要附上验证方法：执行后看哪个指标、预期变成什么样。修改 sysctl 或内核参数属于变更，按 `sre-docs:sre-change-rollout-plan` 推进。
+每条处置建议都要附上验证方法：执行后看哪个指标、预期变成什么样。修改 sysctl 或内核参数属于变更，按 `sre-change-rollout-plan` 推进。
 
 ## 参考
 

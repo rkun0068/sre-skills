@@ -1,7 +1,7 @@
 ---
 name: tech-doc-style
 description: >-
-  CRITICAL — shared style rules for every tech-docs skill, based on the Google developer documentation style guide. Applies and checks voice and tone, second person, active voice, present tense, sentence case headings, lists, procedures, code samples and placeholders, command-line syntax, link text, notices, UI element wording, accessibility, inclusive language, timeless wording, and excessive claims, with a Markdown lint script, a word list, and an adaptation for Chinese documents. TRIGGER when: writing, editing, or reviewing any developer or user documentation (README, 用户手册, 使用文档, 技术文档, API 文档, 教程, quickstart, how-to, release notes); the user asks to 润色/校对/按 Google 风格检查 a document; or tech-doc-writing is about to run. DO NOT TRIGGER when: the output is code comments only with no prose standard requested, marketing copy, or an SRE process document whose structure is defined by sre-docs (those may still borrow these style rules).
+  Shared style rules for tech-docs skills, from the Google developer documentation style guide: tone, voice, headings, lists, procedures, code and placeholders, links, accessibility, inclusive and timeless wording, Chinese typography, plus a Markdown linter. TRIGGER when: writing or reviewing developer or user docs, or 按 Google 风格润色/校对. DO NOT TRIGGER when: writing marketing copy.
 ---
 
 # 技术文档风格规范
@@ -67,8 +67,10 @@ description: >-
 
 ## 检查流程
 
+`SKILL_DIR` 指当前 SKILL.md 所在的目录，文中的 `scripts/`、`references/` 都相对于它。Claude Code 和 Codex 执行命令时，当前目录是用户的工作目录，所以运行脚本时要把 `SKILL_DIR` 换成该目录的绝对路径。
+
 ```
-- [ ] 1. 运行 lint：python3 scripts/lint_style.py FILE.md
+- [ ] 1. 运行 lint：python3 SKILL_DIR/scripts/lint_style.py FILE.md
 - [ ] 2. 逐条处理 error 和 warn；info 级别由你判断是否需要修改
 - [ ] 3. 人工检查 lint 覆盖不到的规则：1、5、7–10、12、16（语义类规则）
 - [ ] 4. 输出修改结果，或者给出评审意见
@@ -77,9 +79,9 @@ description: >-
 lint 用法：
 
 ```bash
-python3 scripts/lint_style.py docs/*.md                    # 自动识别中英文
-python3 scripts/lint_style.py --lang zh --format json README.md
-python3 scripts/lint_style.py --strict docs/               # 有 error 或 warn 时退出码为 1，可接入 CI
+python3 SKILL_DIR/scripts/lint_style.py docs/*.md                    # 自动识别中英文
+python3 SKILL_DIR/scripts/lint_style.py --lang zh --format json README.md
+python3 SKILL_DIR/scripts/lint_style.py --strict docs/               # 有 error 或 warn 时退出码为 1，可接入 CI
 ```
 
 lint 只是辅助手段：它会跳过代码块和行内代码，但仍可能误报，例如在描述 `kill` 命令时出现的 "kill"。误报不要硬改，在评审意见中说明即可。

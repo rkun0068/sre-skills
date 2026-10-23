@@ -1,0 +1,6 @@
+# Codex / ChatGPT skill metadata. Claude Code ignores this file.
+interface:
+  display_name: "Kernel performance analysis"
+  short_description: "60-second checklist and USE method analysis"
+policy:
+  allow_implicit_invocation: true

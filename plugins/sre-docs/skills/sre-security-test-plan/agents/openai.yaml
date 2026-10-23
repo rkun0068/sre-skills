@@ -1,0 +1,6 @@
+# Codex / ChatGPT skill metadata. Claude Code ignores this file.
+interface:
+  display_name: "SRE security test plan"
+  short_description: "Draft or review a security and reliability test plan"
+policy:
+  allow_implicit_invocation: true

@@ -46,4 +46,4 @@ crash /usr/lib/debug/boot/vmlinux-<ver> dump.<ts>         # Ubuntu
 ## 注意
 
 - 在 live 系统上运行 crash（`crash` 不带 vmcore 参数）虽然是只读的，但开销较大，**不要在故障中的生产机上做**。
-- vmcore 中可能包含用户数据和密钥。按 `sre-docs:sre-doc-standards` 的密级规则存放，用完即删。
+- vmcore 中可能包含用户数据和密钥。按 `sre-doc-standards` 的密级规则存放，用完即删。

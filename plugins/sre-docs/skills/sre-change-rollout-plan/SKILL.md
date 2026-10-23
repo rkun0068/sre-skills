@@ -1,7 +1,7 @@
 ---
 name: sre-change-rollout-plan
 description: >-
-  Draft or review a standardized security change & rollout plan following Google's "Building Secure and Reliable Systems" (Ch7 Design for a Changing Landscape, Ch14 Deploying Code) — change type and timeline (zero-day / posture / external demand), incremental-documented-tested-isolated-qualified-staged design, phased rollout with success criteria, audit-only before enforce, acceleration/slowdown/embargo-break contingencies, supply-chain controls (code review, provenance, deployment policy, choke points, breakglass). TRIGGER when: the user asks for 变更方案, 发布计划, 上线方案, rollout plan, 漏洞修复推进计划, 0day 应急补丁计划, 安全基线推广计划, 合规改造计划, or a deployment/supply-chain security review. DO NOT TRIGGER when: the user is executing an already-approved routine deploy, or responding to an active incident (sre-incident-doc).
+  Drafts or reviews a security change and rollout plan (变更/发布/上线方案): change timeline, staged rollout with success criteria, rollback, contingencies, supply-chain controls. TRIGGER when: the user asks for a rollout plan, 漏洞修复推进, or 0day patch plan. DO NOT TRIGGER when: executing an approved routine deploy or handling a live incident.
 ---
 
 # 安全变更与发布计划

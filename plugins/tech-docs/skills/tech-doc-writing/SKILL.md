@@ -1,7 +1,7 @@
 ---
 name: tech-doc-writing
 description: >-
-  Drafts and restructures developer and end-user documentation in Google developer documentation style — README, quickstart, how-to guide, tutorial, concept overview, CLI/API/config reference, troubleshooting guide, and release notes — by choosing the doc type from the reader's need, gathering facts from code and command help instead of inventing them, filling a type-specific template, verifying every command and placeholder, and linting the result. Supports English and Chinese docs. TRIGGER when: the user asks to 写/补/重写 a README, 使用文档, 用户手册, 安装文档, 快速入门, 教程, 操作指南, API/CLI 参考, 配置说明, FAQ/问题排查, 发布说明/release notes, or to document a feature, tool, or repository. DO NOT TRIGGER when: the task is only a style review of an existing doc (tech-doc-style), a design doc or SRE process document (sre-docs skills such as sre-design-review or sre-playbook), or inline code comments without prose docs.
+  Drafts developer and user docs in Google style: README, quickstart, how-to, tutorial, concept, CLI/API/config reference, troubleshooting, release notes. Picks the doc type, gathers facts from code, fills a template, verifies commands, lints. TRIGGER when: the user asks to write 使用文档、用户手册、README、教程. DO NOT TRIGGER when: only reviewing style, or writing SRE or design docs.
 ---
 
 # 编写技术文档与用户文档
@@ -84,7 +84,7 @@ description: >-
 ### 6. Lint 与自检
 
 ```bash
-python3 ../tech-doc-style/scripts/lint_style.py NEW_DOC.md
+python3 SKILL_DIR/../tech-doc-style/scripts/lint_style.py NEW_DOC.md
 ```
 
 处理所有 error 和 warn。然后按对应文档类型的模板末尾的"自检"清单逐项检查。

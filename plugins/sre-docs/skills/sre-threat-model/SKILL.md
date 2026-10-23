@@ -1,7 +1,7 @@
 ---
 name: sre-threat-model
 description: >-
-  Draft or review a standardized threat model / adversary analysis document following Google's "Building Secure and Reliable Systems" (Ch2 Understanding Adversaries) — assets, attacker motivations and profiles, insider-risk scenarios (actor × motive × action × target), kill-chain stages with controls, supply-chain threats, and probability×impact ranking. TRIGGER when: the user asks for a 威胁建模, threat model, 对手分析, attack surface analysis, insider risk assessment, "who would attack this system", or a security section for a design doc. DO NOT TRIGGER when: the user wants a full design doc (use sre-design-review, which links to this), a disaster risk matrix of natural/infra events (use sre-disaster-risk-assessment), or is handling a live incident (use sre-incident-doc).
+  Drafts or reviews a threat model (威胁建模): assets, attacker motives and profiles, insider scenarios, kill-chain controls, supply-chain threats, risk ranking. Based on Building Secure and Reliable Systems. TRIGGER when: the user asks for a threat model, 对手分析, or attack surface review. DO NOT TRIGGER when: a full design doc (sre-design-review) or disaster risk matrix is wanted.
 ---
 
 # 威胁建模文档

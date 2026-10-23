@@ -1,0 +1,6 @@
+# Codex / ChatGPT skill metadata. Claude Code ignores this file.
+interface:
+  display_name: "SRE incident doc"
+  short_description: "Run a live incident command document"
+policy:
+  allow_implicit_invocation: true

@@ -1,6 +1,6 @@
 # SRE Skills
 
-一组遵循 [Agent Skills](https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview) 规范的 Claude Code skill。仓库本身是一个 **plugin marketplace**，每个领域是一个 plugin，可以单独安装：
+一组遵循 Agent Skills 规范的 skill，**同时支持 Claude Code 和 Codex**。仓库本身是一个 plugin marketplace，每个领域是一个 plugin，可以单独安装：
 
 | Plugin | 用途 | 依据 |
 |---|---|---|
@@ -10,16 +10,47 @@
 
 ## 安装
 
-在 Claude Code 中执行：
+### 方式一：作为独立 skill 安装（Claude Code 和 Codex 通用）
+
+```bash
+scripts/install.sh                      # 两个 agent 都装，用软链接
+scripts/install.sh --agent codex        # 只装到 Codex（~/.agents/skills）
+scripts/install.sh --agent claude --plugin sre-kernel --copy
+scripts/install.sh --uninstall          # 只删除由本仓库安装的 skill
+```
+
+| Agent | 安装位置 | 调用方式 |
+|---|---|---|
+| Claude Code | `~/.claude/skills/<skill>` | 自动触发，或 `/<skill>` |
+| Codex | `~/.agents/skills/<skill>` | 自动触发，或输入 `$<skill>` / `/skills` |
+
+软链接会跟随仓库当前检出的分支，`git pull` 后即可更新；切换到没有这些文件的分支时，对应的 skill 会失效。需要和仓库解耦时，用 `--copy`。
+
+### 方式二：作为 plugin 安装
+
+Claude Code：
 
 ```text
 /plugin marketplace add /path/to/sre-skills
-/plugin install sre-docs@sre-skills
 /plugin install sre-kernel@sre-skills
-/plugin install tech-docs@sre-skills
 ```
 
-安装后，skill 带插件命名空间，例如 `sre-kernel:kernel-triage`。跨 plugin 引用时写 skill 名称，不写相对路径。
+Codex（marketplace 来源由 CLI 管理，在 ChatGPT 桌面应用中安装和启用）：
+
+```bash
+codex plugin marketplace add /path/to/sre-skills
+```
+
+Codex 读取 `.agents/plugins/marketplace.json` 和每个 plugin 根目录下的 `plugin.json`；Claude Code 读取 `.claude-plugin/` 下的文件。两套清单指向同一份 skill。
+
+## 双 agent 兼容约定
+
+- `SKILL.md` 的 frontmatter 只用 `name` 和 `description` 两个字段，两边通用。
+- `description` 不超过 400 字符，并且先写用途：Codex 给所有 skill 描述的总预算大约只有 8,000 字符。
+- 正文不写某个 agent 专有的工具或命名空间。引用其他 skill 时写名称，不写 `plugin:skill`。
+- 可执行的脚本路径写成 `SKILL_DIR/scripts/...`，因为两个 agent 都在用户的工作目录里执行命令。
+- `agents/openai.yaml` 是 Codex 的展示元数据，Claude Code 会忽略它。
+- 仓库级的协作说明写在 `AGENTS.md`，`CLAUDE.md` 通过 `@AGENTS.md` 引用它。
 
 ## 设计约定
 
@@ -124,7 +155,8 @@ python3 scripts/validate_skills.py
 ```
 
 检查内容包括：
-- marketplace 和 plugin 清单；
+- 两套 marketplace 和 plugin 清单（Claude Code、Codex）是否一致，版本是否相同；
+- 双 agent 兼容：描述长度和总预算、`agents/openai.yaml`、正文中没有 agent 专有的写法、脚本路径使用 `SKILL_DIR`；
 - frontmatter（名称、长度、触发说明）和 SKILL.md 的行数；
 - 相对链接与脚本路径是否有效；
 - 文档模板与公共约定的引用；

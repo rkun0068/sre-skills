@@ -1,7 +1,7 @@
 ---
 name: sre-incident-response-plan
 description: >-
-  Draft or review a standardized incident response (IR) team charter and response plan following Google's "Building Secure and Reliable Systems" (Ch16 Disaster Planning, Ch17 roles) — staffing model, mission/scope/success criteria, roles (IC, OL, CL, legal, privacy, forensics), single-point-of-failure avoidance, severity & priority models, response SLOs, reporting/triage/outreach/communications plans incl. out-of-band channels, prestaged systems and access, training, procurement, evidence preservation, and tooling. TRIGGER when: the user asks for 事件响应计划, 应急响应预案, IR plan, incident management process, 值班与升级制度, 安全事件响应流程, or an IR team charter. DO NOT TRIGGER when: an incident is happening now (sre-incident-doc), or the user needs a step-by-step procedure for one task (sre-playbook).
+  Drafts or reviews an incident response plan and IR team charter (应急响应预案): roles, severity and priority, response SLOs, escalation, out-of-band comms, prestaged access, training. TRIGGER when: the user asks for an IR plan or 值班与升级制度. DO NOT TRIGGER when: an incident is live (sre-incident-doc) or one procedure is needed (sre-playbook).
 ---
 
 # 事件响应团队章程与响应计划

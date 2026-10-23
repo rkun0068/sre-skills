@@ -1,0 +1,6 @@
+# Codex / ChatGPT skill metadata. Claude Code ignores this file.
+interface:
+  display_name: "Tech doc writing"
+  short_description: "Draft READMEs, guides, references, and release notes"
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "sre-kernel",
+  "version": "0.1.0",
+  "description": "Read-only Linux kernel troubleshooting on RHEL-family and Ubuntu hosts over SSH: triage, crash/oops/vmcore, lockups and hung tasks, performance (USE method).",
+  "repository": "https://github.com/rkun0068/sre-skills",
+  "keywords": [
+    "sre",
+    "linux",
+    "kernel",
+    "troubleshooting"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "SRE Kernel",
+        "category": "Productivity"
+      }
+    }
+  }
+}

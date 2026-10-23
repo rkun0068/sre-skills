@@ -12,7 +12,7 @@
 
 ## 读懂 OOM killer 日志
 
-可以先用 `python3 ../kernel-crash-analysis/scripts/extract_oops.py --summary <日志文件>` 提取关键字段：constraint、所在 memcg、被杀进程及其各类 RSS、gfp_mask 和 order。
+可以先用 `python3 SKILL_DIR/../kernel-crash-analysis/scripts/extract_oops.py --summary LOG_FILE` 提取关键字段：constraint、所在 memcg、被杀进程及其各类 RSS、gfp_mask 和 order。
 
 ```
 <comm> invoked oom-killer: gfp_mask=0x..., order=0, oom_score_adj=0
